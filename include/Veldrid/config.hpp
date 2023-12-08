@@ -10,7 +10,18 @@
 
 #define VD_VALIDATE_USAGE
 
-#ifndef __APPLE__
+#if !defined(_WIN32)
+#	define VD_EXCLUDE_D3D_BACKEND
+#endif // !defined(_WIN32)
+
+#if defined(VD_EXLUDED_D3D_BACKEND)
+#	define VD_EXCLUDE_D3D9_BACKEND
+#	define VD_EXCLUDE_D3D10_BACKEND
+#	define VD_EXCLUDE_D3D11_BACKEND
+#	define VD_EXCLUDE_D3D12_BACKEND
+#endif // defined(VD_EXLUDED_D3D_BACKEND)
+
+#if !defined(__APPLE__)
 #   define VD_EXCLUDE_METAL_BACKEND
 #else
 #   if __has_include(<AppKit/AppKit.h>)
@@ -18,6 +29,6 @@
 #   else
 #       // define VD_EXCLUDE_OPENGL_BACKEND
 #   endif // __has_include(<AppKit/AppKit.h>)
-#endif // __APPLE__
+#endif // !defined(__APPLE__)
 
 #endif /* config_h */

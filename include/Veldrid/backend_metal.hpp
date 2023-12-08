@@ -6,6 +6,9 @@
 //
 
 #if defined(__cplusplus)
+
+#include <Veldrid/config.hpp>
+
 #if !defined(VD_EXCLUDE_METAL_BACKEND)
 #ifndef __VD_METAL_IMPL_HEADER_GUARD
 #define __VD_METAL_IMPL_HEADER_GUARD

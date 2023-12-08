@@ -9,7 +9,9 @@
 #ifndef __VD_HPP_HEADER_GUARD
 #define __VD_HPP_HEADER_GUARD
 
-#include <Mochi/Mochi.hpp>
+#include <Mochi/common.hpp>
+#include <Mochi/core.hpp>
+#include <vector>
 #include <Veldrid/config.hpp>
 #include <optional>
 #include <sstream>
@@ -78,10 +80,8 @@ public:
 
 __MC_DEFINE_REF_TYPE(GraphicsApiVersion)
 
-enum PixelFormat {
-#define __ENTRY(name) PixelFormat##name
-    __ENTRY(R8_G8_B8_A8_UNorm),
-#undef __ENTRY
+enum class PixelFormat {
+    R8_G8_B8_A8_UNorm,
 };
 
 // MARK: ResourceBindingModel
@@ -127,34 +127,36 @@ struct SwapchainDescription {
     Mochi::Bool ColorSrgb;
 };
 
-enum GraphicsDeviceFeatures : Mochi::UInt32 {
-#define __ENTRY(name) GDFeature##name
-    __ENTRY(None)                     = 0,
-    __ENTRY(ComputeShader)            = 1 << 0,
-    __ENTRY(GeometryShader)           = 1 << 1,
-    __ENTRY(TessellationShaders)      = 1 << 2,
-    __ENTRY(MultipleViewports)        = 1 << 3,
-    __ENTRY(SamplerLodBias)           = 1 << 4,
-    __ENTRY(DrawBaseVertex)           = 1 << 5,
-    __ENTRY(DrawBaseInstance)         = 1 << 6,
-    __ENTRY(DrawIndirect)             = 1 << 7,
-    __ENTRY(DrawIndirectBaseInstance) = 1 << 8,
-    __ENTRY(FillModeWireframe)        = 1 << 9,
-    __ENTRY(SamplerAnisotropy)        = 1 << 10,
-    __ENTRY(DepthClipDisable)         = 1 << 11,
-    __ENTRY(Texture1D)                = 1 << 12,
-    __ENTRY(IndependentBlend)         = 1 << 13,
-    __ENTRY(StructuredBuffer)         = 1 << 14,
-    __ENTRY(SubsetTextureView)        = 1 << 15,
-    __ENTRY(CommandListDebugMarkers)  = 1 << 16,
-    __ENTRY(BufferRangeBinding)       = 1 << 17,
-    __ENTRY(ShaderFloat64)            = 1 << 18
-#undef __ENTRY
+enum class GraphicsDeviceFeatures : Mochi::UInt32 {
+    None                     = 0,
+    ComputeShader            = 1 << 0,
+    GeometryShader           = 1 << 1,
+    TessellationShaders      = 1 << 2,
+    MultipleViewports        = 1 << 3,
+    SamplerLodBias           = 1 << 4,
+    DrawBaseVertex           = 1 << 5,
+    DrawBaseInstance         = 1 << 6,
+    DrawIndirect             = 1 << 7,
+    DrawIndirectBaseInstance = 1 << 8,
+    FillModeWireframe        = 1 << 9,
+    SamplerAnisotropy        = 1 << 10,
+    DepthClipDisable         = 1 << 11,
+    Texture1D                = 1 << 12,
+    IndependentBlend         = 1 << 13,
+    StructuredBuffer         = 1 << 14,
+    SubsetTextureView        = 1 << 15,
+    CommandListDebugMarkers  = 1 << 16,
+    BufferRangeBinding       = 1 << 17,
+    ShaderFloat64            = 1 << 18
 };
 
 inline GraphicsDeviceFeatures operator|(GraphicsDeviceFeatures a, GraphicsDeviceFeatures b) {
     return static_cast<GraphicsDeviceFeatures>(static_cast<Mochi::UInt32>(a) |
                                                static_cast<Mochi::UInt32>(b));
+}
+
+inline bool operator&(GraphicsDeviceFeatures a, GraphicsDeviceFeatures b) {
+    return (static_cast<Mochi::UInt32>(a) & static_cast<Mochi::UInt32>(b)) != 0;
 }
 
 enum class GraphicsBackend {
@@ -201,15 +203,13 @@ struct RgbaFloat {
 };
 
 enum ColorWriteMask : int {
-#define __ENTRY(name) ColorWriteMask##name
-    __ENTRY(None),
-    __ENTRY(Red)   = 1 << 0,
-    __ENTRY(Green) = 1 << 1,
-    __ENTRY(Blue)  = 1 << 2,
-    __ENTRY(Alpha) = 1 << 3,
+    None,
+    Red   = 1 << 0,
+    Green = 1 << 1,
+    Blue  = 1 << 2,
+    Alpha = 1 << 3,
     
-    __ENTRY(All) = __ENTRY(Red) | __ENTRY(Green) | __ENTRY(Blue) | __ENTRY(Alpha)
-#undef __ENTRY
+    All = Red | Green | Blue | Alpha
 };
 
 inline ColorWriteMask operator|(ColorWriteMask a, ColorWriteMask b) {
@@ -217,22 +217,18 @@ inline ColorWriteMask operator|(ColorWriteMask a, ColorWriteMask b) {
                                        static_cast<int>(b));
 }
 
-enum BlendFactor {
-#define __ENTRY(name) BlendFactor##name
-    __ENTRY(Zero),
-    __ENTRY(One),
-    __ENTRY(SourceAlpha),
+enum class BlendFactor {
+    Zero,
+    One,
+    SourceAlpha,
     // TODO: Write remaining entries
-#undef __ENTRY
 };
 
-enum BlendFunction {
-#define __ENTRY(name) BlendFunction##name
-    __ENTRY(Add),
-    __ENTRY(Subtract),
-    __ENTRY(ReverseSubtract),
+enum class BlendFunction {
+    Add,
+    Subtract,
+    ReverseSubtract,
     // TODO: Write remaining entries
-#undef __ENTRY
 };
 
 struct BlendAttachmentDescription {
@@ -259,27 +255,23 @@ struct BlendStateDescription {
     Mochi::Bool AlphaToCoverageEnabled;
 };
 
-enum ResourceKind {
-#define __ENTRY(name) ResourceKind##name
-    __ENTRY(UniformBuffer),
-    __ENTRY(StructuredBufferReadOnly),
-    __ENTRY(StructuredBufferReadWrite),
-    __ENTRY(TextureReadOnly),
-    __ENTRY(TextureReadWrite),
-    __ENTRY(Sampler)
-#undef __ENTRY
+enum class ResourceKind {
+    UniformBuffer,
+    StructuredBufferReadOnly,
+    StructuredBufferReadWrite,
+    TextureReadOnly,
+    TextureReadWrite,
+    Sampler
 };
 
-enum ShaderStages : Mochi::UInt8 {
-#define __ENTRY(name) ShaderStage##name
-    __ENTRY(None),
-    __ENTRY(Vertex)                 = 1 << 0,
-    __ENTRY(Geometry)               = 1 << 1,
-    __ENTRY(TessellationControl)    = 1 << 2,
-    __ENTRY(TessellationEvaluation) = 1 << 3,
-    __ENTRY(Fragment)               = 1 << 4,
-    __ENTRY(Compute)                = 1 << 5,
-#undef __ENTRY
+enum class ShaderStages : Mochi::UInt8 {
+    None,
+    Vertex                 = 1 << 0,
+    Geometry               = 1 << 1,
+    TessellationControl    = 1 << 2,
+    TessellationEvaluation = 1 << 3,
+    Fragment               = 1 << 4,
+    Compute                = 1 << 5,
 };
 
 inline ShaderStages operator|(ShaderStages a, ShaderStages b) {
@@ -287,16 +279,18 @@ inline ShaderStages operator|(ShaderStages a, ShaderStages b) {
                                      static_cast<Mochi::UInt8>(b));
 }
 
-enum ResourceLayoutElementOptions : int {
-#define __ENTRY(name) ResourceLayoutElementOption##name
-    __ENTRY(None),
-    __ENTRY(DynamicBinding)         = 1 << 0
-#undef __ENTRY
+enum class ResourceLayoutElementOptions : int {
+    None,
+    DynamicBinding         = 1 << 0
 };
 
 inline ResourceLayoutElementOptions operator|(ResourceLayoutElementOptions a, ResourceLayoutElementOptions b) {
     return static_cast<ResourceLayoutElementOptions>(static_cast<int>(a) |
                                                      static_cast<int>(b));
+}
+
+inline bool operator&(ResourceLayoutElementOptions a, ResourceLayoutElementOptions b) {
+    return (static_cast<int>(a) & static_cast<int>(b)) != 0;
 }
 
 struct ResourceLayoutElementDescription {
@@ -378,8 +372,20 @@ class OpenGLPlatformInfo;
 typedef std::shared_ptr<OpenGLPlatformInfo> OpenGLPlatformInfoRef;
 #endif // !defined(VD_EXCLUDE_OPENGL_BACKEND)
 
+#if !defined(VD_EXCLUDE_D3D11_BACKEND)
+struct D3D11DeviceOptions {
+    void*         AdapterPtr;
+    Mochi::UInt32 DeviceCreationFlags;
+};
+#endif // !defined(VD_EXCLUDE_D3D11_BACKEND)
+
 class GraphicsDevice :
 public Mochi::IDisposable, public std::enable_shared_from_this<GraphicsDevice> {
+    using Ref = std::shared_ptr<GraphicsDevice>;
+
+protected:
+    void PostDeviceCreated();
+
 public:
     virtual void InitializeComponents() = 0;
     
@@ -392,20 +398,39 @@ public:
     virtual Mochi::Bool IsClipSpaceYInverted() = 0;
     virtual ResourceFactoryRef GetResourceFactory() = 0;
     virtual GraphicsDeviceFeatures GetFeatures() = 0;
+
+#if !defined(VD_EXCLUDE_D3D11_BACKEND)
+    // MARK: Methods with DirectX 11 included
+    static Ref CreateD3D11(GraphicsDeviceOptions options);
+    static Ref CreateD3D11(GraphicsDeviceOptions options, 
+                           SwapchainDescription description);
+    static Ref CreateD3D11(GraphicsDeviceOptions options,
+                           D3D11DeviceOptions d3d11options);
+    static Ref CreateD3D11(GraphicsDeviceOptions options,
+                           D3D11DeviceOptions d3d11options,
+                           SwapchainDescription description);
+    static Ref CreateD3D11(GraphicsDeviceOptions options,
+                           void *hWnd, 
+                           Mochi::UInt32 width,
+                           Mochi::UInt32 height);
+#else
+    // MARK: Methods with DirectX 11 excluded (placeholders)
+    static Ref CreateD3D11(GraphicsDeviceOptions options, ...);
+#endif
     
 #if !defined(VD_EXCLUDE_OPENGL_BACKEND)
     // MARK: Methods with OpenGL included
-    static std::shared_ptr<GraphicsDevice> CreateOpenGL(GraphicsDeviceOptions options,
-                                                        OpenGLPlatformInfoRef info,
-                                                        Mochi::UInt32 width,
-                                                        Mochi::UInt32 height);
+    static Ref CreateOpenGL(GraphicsDeviceOptions options,
+                            OpenGLPlatformInfoRef info,
+                            Mochi::UInt32 width,
+                            Mochi::UInt32 height);
     
-    static std::shared_ptr<GraphicsDevice> CreateOpenGLES(GraphicsDeviceOptions options,
-                                                          SwapchainDescription description);
+    static Ref CreateOpenGLES(GraphicsDeviceOptions options,
+                              SwapchainDescription description);
 #else
     // MARK: Methods with OpenGL excluded (placeholders)
-    static std::shared_ptr<GraphicsDevice> CreateOpenGL(GraphicsDeviceOptions options, ...);
-    static std::shared_ptr<GraphicsDevice> CreateOpenGLES(GraphicsDeviceOptions options, ...);
+    static Ref CreateOpenGL(GraphicsDeviceOptions options, ...);
+    static Ref CreateOpenGLES(GraphicsDeviceOptions options, ...);
 #endif // !defined(VD_EXCLUDE_OPENGL_BACKEND)
     
 #if !defined(VD_EXCLUDE_METAL_BACKEND)
@@ -417,14 +442,14 @@ public:
 #endif // defined(__VD_TARGET_MACOS)
     
     // MARK: Methods with Metal included
-    static std::shared_ptr<GraphicsDevice> CreateMetal(GraphicsDeviceOptions options);
-    static std::shared_ptr<GraphicsDevice> CreateMetal(GraphicsDeviceOptions options,
-                                                       SwapchainDescription description);
-    static std::shared_ptr<GraphicsDevice> CreateMetal(GraphicsDeviceOptions options,
-                                                       MetalContainerRef container);
+    static Ref CreateMetal(GraphicsDeviceOptions options);
+    static Ref CreateMetal(GraphicsDeviceOptions options,
+                           SwapchainDescription description);
+    static Ref CreateMetal(GraphicsDeviceOptions options,
+                           MetalContainerRef container);
 #else
     // MARK: Methods with Metal excluded (placeholders)
-    static std::shared_ptr<GraphicsDevice> CreateMetal(GraphicsDeviceOptions options, ...);
+    static Ref CreateMetal(GraphicsDeviceOptions options, ...);
 #endif // !defined(VD_EXCLUDE_METAL_BACKEND)
 };
 

@@ -104,7 +104,7 @@ ResourceLayout::ResourceLayout(ResourceLayoutDescription& description) {
     _description = description;
     
     for (auto element : description.Elements) {
-        if ((element.Options & ResourceLayoutElementOptionDynamicBinding) != 0) {
+        if (element.Options & ResourceLayoutElementOptions::DynamicBinding) {
             _dynamicBufferCount++;
         }
     }
@@ -132,7 +132,7 @@ ResourceFactory::ResourceFactory(GraphicsDeviceFeatures features)
 
 PipelineRef ResourceFactory::CreateGraphicsPipeline(GraphicsPipelineDescription &description) {
 #if defined(VD_VALIDATE_USAGE)
-    if ((_features & GDFeatureIndependentBlend) == 0) {
+    if (!(_features & GraphicsDeviceFeatures::IndependentBlend)) {
         if (description.BlendState.AttachmentStates.size() > 0) {
             auto attachmentState = description.BlendState.AttachmentStates[0];
             for (int i = 1; i < description.BlendState.AttachmentStates.size(); i++) {
@@ -148,6 +148,10 @@ PipelineRef ResourceFactory::CreateGraphicsPipeline(GraphicsPipelineDescription 
 }
 
 // MARK: -
+
+void GraphicsDevice::PostDeviceCreated() {
+    
+}
 
 [[noreturn]] inline void ThrowPlatformExcludedException(std::string name) {
     throw VeldridException(name + " support has not been included in this configuration of Veldrid");
