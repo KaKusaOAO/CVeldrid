@@ -18,13 +18,13 @@
 		22C6F9AF2B22F00D00F5373C /* vd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9AD2B22F00D00F5373C /* vd.cpp */; };
 		22C6F9B22B22F02500F5373C /* backend_opengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9B02B22F02500F5373C /* backend_opengl.cpp */; };
 		22C6F9B32B22F02500F5373C /* backend_metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9B12B22F02500F5373C /* backend_metal.mm */; };
-		22C6F9C02B22F06300F5373C /* Mochi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9BB2B22F05E00F5373C /* Mochi.framework */; };
-		22C6F9C12B22F06300F5373C /* Mochi.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9BB2B22F05E00F5373C /* Mochi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		22C6F9C62B22F08800F5373C /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9C32B22F08800F5373C /* MetalKit.framework */; };
 		22C6F9C72B22F08800F5373C /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9C42B22F08800F5373C /* Metal.framework */; };
 		22C6F9C82B22F08800F5373C /* MetalFX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9C52B22F08800F5373C /* MetalFX.framework */; platformFilter = ios; };
 		22C6F9CB2B22F08E00F5373C /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9C92B22F08E00F5373C /* OpenGLES.framework */; platformFilter = ios; };
 		22C6F9CC2B22F08E00F5373C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9CA2B22F08E00F5373C /* OpenGL.framework */; platformFilters = (macos, ); };
+		22C6FA0B2B22F5A900F5373C /* Mochi.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6FA032B22F44C00F5373C /* Mochi.framework */; };
+		22C6FA0C2B22F5A900F5373C /* Mochi.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6FA032B22F44C00F5373C /* Mochi.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,16 +35,16 @@
 			remoteGlobalIDString = 22C6F9872B22EF4C00F5373C;
 			remoteInfo = Veldrid;
 		};
-		22C6F9BA2B22F05E00F5373C /* PBXContainerItemProxy */ = {
+		22C6FA022B22F44C00F5373C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 22C6F9B42B22F05D00F5373C /* Mochi.xcodeproj */;
+			containerPortal = 22C6F9FC2B22F44C00F5373C /* Mochi.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 22C6F7FC2B22C53A00F5373C;
 			remoteInfo = Mochi;
 		};
-		22C6F9BC2B22F05E00F5373C /* PBXContainerItemProxy */ = {
+		22C6FA042B22F44C00F5373C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 22C6F9B42B22F05D00F5373C /* Mochi.xcodeproj */;
+			containerPortal = 22C6F9FC2B22F44C00F5373C /* Mochi.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 22C6F8062B22C53B00F5373C;
 			remoteInfo = MochiTests;
@@ -58,7 +58,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				22C6F9C12B22F06300F5373C /* Mochi.framework in Embed Frameworks */,
+				22C6FA0C2B22F5A900F5373C /* Mochi.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -78,13 +78,13 @@
 		22C6F9AD2B22F00D00F5373C /* vd.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = vd.cpp; path = ../src/vd.cpp; sourceTree = "<group>"; };
 		22C6F9B02B22F02500F5373C /* backend_opengl.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = backend_opengl.cpp; path = ../src/backends/backend_opengl.cpp; sourceTree = "<group>"; };
 		22C6F9B12B22F02500F5373C /* backend_metal.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = backend_metal.mm; path = ../src/backends/backend_metal.mm; sourceTree = "<group>"; };
-		22C6F9B42B22F05D00F5373C /* Mochi.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Mochi.xcodeproj; path = ../../CMochi/xcode/Mochi.xcodeproj; sourceTree = "<group>"; };
 		22C6F9C32B22F08800F5373C /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.0.sdk/System/Library/Frameworks/MetalKit.framework; sourceTree = DEVELOPER_DIR; };
 		22C6F9C42B22F08800F5373C /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.0.sdk/System/Library/Frameworks/Metal.framework; sourceTree = DEVELOPER_DIR; };
 		22C6F9C52B22F08800F5373C /* MetalFX.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalFX.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.0.sdk/System/Library/Frameworks/MetalFX.framework; sourceTree = DEVELOPER_DIR; };
 		22C6F9C92B22F08E00F5373C /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS17.0.sdk/System/Library/Frameworks/OpenGLES.framework; sourceTree = DEVELOPER_DIR; };
 		22C6F9CA2B22F08E00F5373C /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		22C6F9CD2B22F0D700F5373C /* json.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = json.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		22C6F9FC2B22F44C00F5373C /* Mochi.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Mochi.xcodeproj; path = ../3rdparty/CMochi/xcode/Mochi.xcodeproj; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,9 +93,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				22C6F9CB2B22F08E00F5373C /* OpenGLES.framework in Frameworks */,
-				22C6F9C02B22F06300F5373C /* Mochi.framework in Frameworks */,
 				22C6F9C72B22F08800F5373C /* Metal.framework in Frameworks */,
 				22C6F9C82B22F08800F5373C /* MetalFX.framework in Frameworks */,
+				22C6FA0B2B22F5A900F5373C /* Mochi.framework in Frameworks */,
 				22C6F9C62B22F08800F5373C /* MetalKit.framework in Frameworks */,
 				22C6F9CC2B22F08E00F5373C /* OpenGL.framework in Frameworks */,
 			);
@@ -115,7 +115,7 @@
 		22C6F97E2B22EF4C00F5373C = {
 			isa = PBXGroup;
 			children = (
-				22C6F9B42B22F05D00F5373C /* Mochi.xcodeproj */,
+				22C6F9FC2B22F44C00F5373C /* Mochi.xcodeproj */,
 				22C6F9A22B22EF7300F5373C /* Headers */,
 				22C6F9A32B22EF7800F5373C /* Sources */,
 				22C6F98A2B22EF4C00F5373C /* Veldrid */,
@@ -172,15 +172,6 @@
 			name = Sources;
 			sourceTree = "<group>";
 		};
-		22C6F9B52B22F05D00F5373C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				22C6F9BB2B22F05E00F5373C /* Mochi.framework */,
-				22C6F9BD2B22F05E00F5373C /* MochiTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		22C6F9BF2B22F06300F5373C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -192,6 +183,15 @@
 				22C6F9C32B22F08800F5373C /* MetalKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		22C6F9FD2B22F44C00F5373C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				22C6FA032B22F44C00F5373C /* Mochi.framework */,
+				22C6FA052B22F44C00F5373C /* MochiTests.xctest */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -280,8 +280,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 22C6F9B52B22F05D00F5373C /* Products */;
-					ProjectRef = 22C6F9B42B22F05D00F5373C /* Mochi.xcodeproj */;
+					ProductGroup = 22C6F9FD2B22F44C00F5373C /* Products */;
+					ProjectRef = 22C6F9FC2B22F44C00F5373C /* Mochi.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -293,18 +293,18 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		22C6F9BB2B22F05E00F5373C /* Mochi.framework */ = {
+		22C6FA032B22F44C00F5373C /* Mochi.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
 			path = Mochi.framework;
-			remoteRef = 22C6F9BA2B22F05E00F5373C /* PBXContainerItemProxy */;
+			remoteRef = 22C6FA022B22F44C00F5373C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		22C6F9BD2B22F05E00F5373C /* MochiTests.xctest */ = {
+		22C6FA052B22F44C00F5373C /* MochiTests.xctest */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = MochiTests.xctest;
-			remoteRef = 22C6F9BC2B22F05E00F5373C /* PBXContainerItemProxy */;
+			remoteRef = 22C6FA042B22F44C00F5373C /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */

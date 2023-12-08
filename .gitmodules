@@ -1,0 +1,3 @@
+[submodule "3rdparty/CMochi"]
+	path = 3rdparty/CMochi
+	url = https://github.com/KaKusaOAO/CMochi
