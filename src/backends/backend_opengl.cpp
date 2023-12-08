@@ -14,6 +14,13 @@
 #endif
 
 namespace vd {
+#define __VD_DEFINE_GL(name, ret, ...) \
+    GL:: name##_t GL:: _p_##name ;
+
+    // MARK: Static members of function pointers
+    __VD_DEFINE_GL_FUNCS
+
+#undef __VD_DEFINE_GL
 
 	void GL::glGenVertexArrays(GLsizei n, GLuint* arrays) { _p_glGenVertexArrays(n, arrays); }
 	GLenum GL::glGetError() { return _p_glGetError(); }

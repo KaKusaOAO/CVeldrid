@@ -99,28 +99,28 @@ MTLGraphicsDevice::MTLGraphicsDevice(GraphicsDeviceOptions options,
     int minor = (int) _metalFeatures->GetMaxGPUFamily() % 10000;
     _apiVersion = std::make_shared<GraphicsApiVersion>(major, minor, 0, 0);
     
-    _features = (GDFeatureComputeShader |
-                 GDFeatureDrawIndirect |
-                 GDFeatureDrawIndirectBaseInstance |
-                 GDFeatureFillModeWireframe |
-                 GDFeatureSamplerAnisotropy |
-                 GDFeatureDepthClipDisable |
-                 GDFeatureTexture1D |
-                 GDFeatureIndependentBlend |
-                 GDFeatureStructuredBuffer |
-                 GDFeatureSubsetTextureView |
-                 GDFeatureCommandListDebugMarkers |
-                 GDFeatureBufferRangeBinding);
+    _features = (GraphicsDeviceFeatures::ComputeShader |
+                 GraphicsDeviceFeatures::DrawIndirect |
+                 GraphicsDeviceFeatures::DrawIndirectBaseInstance |
+                 GraphicsDeviceFeatures::FillModeWireframe |
+                 GraphicsDeviceFeatures::SamplerAnisotropy |
+                 GraphicsDeviceFeatures::DepthClipDisable |
+                 GraphicsDeviceFeatures::Texture1D |
+                 GraphicsDeviceFeatures::IndependentBlend |
+                 GraphicsDeviceFeatures::StructuredBuffer |
+                 GraphicsDeviceFeatures::SubsetTextureView |
+                 GraphicsDeviceFeatures::CommandListDebugMarkers |
+                 GraphicsDeviceFeatures::BufferRangeBinding);
     
     if (_metalFeatures->IsSupported(MTLGPUFamilyMac1)) {
         _features = (_features |
-                     GDFeatureMultipleViewports);
+                     GraphicsDeviceFeatures::MultipleViewports);
     }
     
     if (_metalFeatures->IsDrawBaseVertexInstanceSupported()) {
         _features = (_features |
-                     GDFeatureDrawBaseVertex |
-                     GDFeatureDrawBaseInstance);
+                     GraphicsDeviceFeatures::DrawBaseVertex |
+                     GraphicsDeviceFeatures::DrawBaseInstance);
     }
     
     _resourceBindingModel = options.ResourceBindingModel;
