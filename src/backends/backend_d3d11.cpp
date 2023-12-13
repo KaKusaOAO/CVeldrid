@@ -54,7 +54,8 @@ namespace vd {
 			CheckResult(D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE, 0, flags, 0, 0, D3D11_SDK_VERSION, &_device, &level, 0));
 		}
 
-		IDXGIDevice* dxgiDevice = dynamic_cast<IDXGIDevice*>(_device);
+		IDXGIDevice* dxgiDevice;
+		CheckResult(_device->QueryInterface<IDXGIDevice>(&dxgiDevice));
 		CheckResult(dxgiDevice->GetAdapter(&_dxgiAdapter));
 
 		DXGI_ADAPTER_DESC desc;
