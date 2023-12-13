@@ -118,6 +118,12 @@ public:
 
 __MC_DEFINE_REF_TYPE(SwapchainSource)
 
+class IMappableResource {};
+__MC_DEFINE_REF_TYPE(IMappableResource)
+
+class IBindableResource {};
+__MC_DEFINE_REF_TYPE(IBindableResource)
+
 struct SwapchainDescription {
     SwapchainSourceRef Source;
     Mochi::UInt32 Width;
@@ -172,8 +178,8 @@ struct OutputAttachmentDescription {
     Mochi::Bool operator==(const OutputAttachmentDescription& other);
 };
 
-enum TextureSampleCount {
-#define __ENTRY(count) TextureSampleCount##count = count
+enum class TextureSampleCount {
+#define __ENTRY(count) Count##count = count
     __ENTRY(1),
     __ENTRY(2),
     __ENTRY(4),
@@ -183,10 +189,15 @@ enum TextureSampleCount {
 #undef __ENTRY
 };
 
+class Framebuffer;
+__MC_DEFINE_REF_TYPE(Framebuffer)
+
 struct OutputDescription {
     std::optional<OutputAttachmentDescription> DepthAttachment;
     std::vector<OutputAttachmentDescription> ColorAttachments;
     TextureSampleCount SampleCount;
+    
+    static OutputDescription CreateFromFramebuffer(FramebufferRef fb);
 };
 
 class IDeviceResource {
@@ -194,6 +205,18 @@ public:
     virtual std::string GetName() = 0;
     virtual void SetName(std::string name) = 0;
 };
+
+class Fence : public IDeviceResource, public Mochi::IDisposable {
+public:
+    virtual Mochi::Bool IsSignaled() = 0;
+    virtual void Reset() = 0;
+    virtual std::string GetName() override = 0;
+    virtual void SetName(std::string name) override = 0;
+    virtual Mochi::Bool IsDisposed() = 0;
+    virtual void Dispose() override = 0;
+};
+
+__MC_DEFINE_REF_TYPE(Fence)
 
 struct RgbaFloat {
     float R;
@@ -350,19 +373,195 @@ public:
 
 __MC_DEFINE_REF_TYPE(Pipeline)
 
+class Texture;
+__MC_DEFINE_REF_TYPE(Texture)
+
+struct TextureViewDescription {
+    TextureRef Target;
+    Mochi::UInt32 BaseMipLevel;
+    Mochi::UInt32 MipLevels;
+    Mochi::UInt32 BaseArrayLayer;
+    Mochi::UInt32 ArrayLayers;
+    std::optional<PixelFormat> Format;
+    
+    TextureViewDescription(TextureRef target);
+    TextureViewDescription(TextureRef target, PixelFormat format);
+    TextureViewDescription(TextureRef target, Mochi::UInt32 baseMipLevel, Mochi::UInt32 mipLevels, Mochi::UInt32 baseArrayLayer, Mochi::UInt32 arrayLayers);
+    TextureViewDescription(TextureRef target, PixelFormat format, Mochi::UInt32 baseMipLevel, Mochi::UInt32 mipLevels, Mochi::UInt32 baseArrayLayer, Mochi::UInt32 arrayLayers);
+    
+    Mochi::Bool operator=(const TextureViewDescription& other);
+};
+
+class TextureView : public IBindableResource, public IDeviceResource, public Mochi::IDisposable {
+private:
+    TextureRef _target;
+    
+protected:
+    TextureView(TextureViewDescription& description);
+    
+public:
+    TextureRef    GetTarget();
+    Mochi::UInt32 GetBaseMipLevel();
+    Mochi::UInt32 GetMipLevels();
+    Mochi::UInt32 GetBaseArrayLayer();
+    Mochi::UInt32 GetArrayLayers();
+    PixelFormat   GetFormat();
+    
+    virtual std::string GetName() override = 0;
+    virtual void SetName(std::string name) override = 0;
+    virtual Mochi::Bool IsDisposed() = 0;
+    virtual void Dispose() override = 0;
+};
+
+__MC_DEFINE_REF_TYPE(TextureView)
+
+enum class TextureUsage : char {
+    Sampled         = 1 << 0,
+    Storage         = 1 << 1,
+    RenderTarget    = 1 << 2,
+    DepthStencil    = 1 << 3,
+    Cubemap         = 1 << 4,
+    Staging         = 1 << 5,
+    GenerateMipmaps = 1 << 6
+};
+
+inline TextureUsage operator|(TextureUsage a, TextureUsage b) {
+    return static_cast<TextureUsage>(static_cast<char>(a) | static_cast<char>(b));
+}
+
+inline Mochi::Bool operator&(TextureUsage a, TextureUsage b) {
+    return (static_cast<char>(a) & static_cast<char>(b)) != 0;
+}
+
+enum class TextureType {
+    Texture1D,
+    Texture2D,
+    Texture3D
+};
+
+struct TextureDescription {
+    Mochi::UInt32 Width;
+    Mochi::UInt32 Height;
+    Mochi::UInt32 Depth;
+    Mochi::UInt32 MipLevels;
+    Mochi::UInt32 ArrayLayers;
+    PixelFormat Format;
+    TextureUsage Usage;
+    TextureType Type;
+    TextureSampleCount SampleCount;
+    
+    static TextureDescription Texture1D(Mochi::UInt32 width, Mochi::UInt32 mipLevels, Mochi::UInt32 arrayLayers, PixelFormat format, TextureUsage usage);
+    static TextureDescription Texture2D(Mochi::UInt32 width, Mochi::UInt32 height, Mochi::UInt32 mipLevels, Mochi::UInt32 arrayLayers, PixelFormat format, TextureUsage usage);
+    static TextureDescription Texture2D(Mochi::UInt32 width, Mochi::UInt32 height, Mochi::UInt32 mipLevels, Mochi::UInt32 arrayLayers, PixelFormat format, TextureUsage usage, TextureSampleCount sampleCount);
+    static TextureDescription Texture3D(Mochi::UInt32 width, Mochi::UInt32 height, Mochi::UInt32 depth, Mochi::UInt32 mipLevels, PixelFormat format, TextureUsage usage);
+};
+
+class GraphicsDevice;
+__MC_DEFINE_REF_TYPE(GraphicsDevice)
+
+class Texture : public IDeviceResource, public IMappableResource, public Mochi::IDisposable, public IBindableResource, public std::enable_shared_from_this<Texture> {
+private:
+    std::mutex     _fullTextureViewLock;
+    TextureViewRef _fullTextureView;
+    
+protected:
+    TextureViewRef CreateFullTextureView(GraphicsDeviceRef gd);
+    virtual void DisposeCore() = 0;
+    
+public:
+    Mochi::UInt32 CalculateSubresource(Mochi::UInt32 mipLevel, Mochi::UInt32 arrayLayer);
+    TextureViewRef GetFullTextureView(GraphicsDeviceRef gd);
+    
+    virtual PixelFormat        GetFormat()      = 0;
+    virtual Mochi::UInt32      GetWidth()       = 0;
+    virtual Mochi::UInt32      GetHeight()      = 0;
+    virtual Mochi::UInt32      GetDepth()       = 0;
+    virtual Mochi::UInt32      GetMipLevels()   = 0;
+    virtual Mochi::UInt32      GetArrayLayers() = 0;
+    virtual TextureUsage       GetUsage()       = 0;
+    virtual TextureType        GetType()        = 0;
+    virtual TextureSampleCount GetSampleCount() = 0;
+    
+    virtual std::string GetName() override = 0;
+    virtual void SetName(std::string name) override = 0;
+    virtual Mochi::Bool IsDisposed() = 0;
+    virtual void Dispose() override;
+};
+
+struct FramebufferAttachment {
+    TextureRef Target;
+    Mochi::UInt32 ArrayLayer;
+    Mochi::UInt32 MipLevel;
+    
+    FramebufferAttachment(TextureRef target, Mochi::UInt32 arrayLayer);
+    FramebufferAttachment(TextureRef target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel);
+};
+
+struct FramebufferAttachmentDescription {
+    TextureRef Target;
+    Mochi::UInt32 ArrayLayer;
+    Mochi::UInt32 MipLevel;
+    
+    FramebufferAttachmentDescription(TextureRef target, Mochi::UInt32 arrayLayer);
+    FramebufferAttachmentDescription(TextureRef target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel);
+};
+
+struct FramebufferDescription {
+    std::optional<FramebufferAttachmentDescription> DepthTarget;
+    std::vector<FramebufferAttachmentDescription> ColorTargets;
+};
+
+class Framebuffer : public IDeviceResource, public Mochi::IDisposable, public std::enable_shared_from_this<Framebuffer> {
+private:
+    std::optional<FramebufferAttachment> _depthTarget;
+    std::vector<FramebufferAttachment> _colorTargets;
+    OutputDescription _outputDescription;
+    
+protected:
+    Framebuffer();
+    Framebuffer(std::optional<FramebufferAttachmentDescription> depthTarget,
+                std::vector<FramebufferAttachmentDescription> colorTargets);
+    void InitializeComponent();
+    
+public:
+    virtual std::optional<FramebufferAttachment> GetDepthTarget();
+    virtual std::vector<FramebufferAttachment> GetColorTargets();
+    virtual OutputDescription GetOutputDescription();
+    
+    virtual std::string GetName() override = 0;
+    virtual void SetName(std::string name) override = 0;
+    virtual Mochi::Bool IsDisposed() = 0;
+    virtual void Dispose() override = 0;
+};
+
+class CommandList : public IDeviceResource, public Mochi::IDisposable {
+private:
+    GraphicsDeviceFeatures _features;
+    Mochi::UInt32 _uniformBufferAlignment;
+    Mochi::UInt32 _structuredBufferAlignment;
+    
+protected:
+    
+};
+
+__MC_DEFINE_REF_TYPE(CommandList)
+
 class ResourceFactory {
 private:
     GraphicsDeviceFeatures _features;
     
 protected:
     ResourceFactory(GraphicsDeviceFeatures features);
-    virtual PipelineRef CreateGraphicsPipelineCore(GraphicsPipelineDescription& description) = 0;
+    virtual TextureViewRef CreateTextureViewCore(TextureViewDescription& description) = 0;
+    virtual PipelineRef    CreateGraphicsPipelineCore(GraphicsPipelineDescription& description) = 0;
     
 public:
     virtual GraphicsBackend GetBackendType() = 0;
     GraphicsDeviceFeatures GetFeatures();
     
-    PipelineRef CreateGraphicsPipeline(GraphicsPipelineDescription& description);
+    TextureViewRef CreateTextureView(TextureRef target);
+    TextureViewRef CreateTextureView(TextureViewDescription& description);
+    PipelineRef    CreateGraphicsPipeline(GraphicsPipelineDescription& description);
 };
 
 __MC_DEFINE_REF_TYPE(ResourceFactory)
@@ -385,6 +584,7 @@ public Mochi::IDisposable, public std::enable_shared_from_this<GraphicsDevice> {
 
 protected:
     void PostDeviceCreated();
+    virtual void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) = 0;
 
 public:
     virtual void InitializeComponents() = 0;

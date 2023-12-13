@@ -167,6 +167,9 @@ namespace vd {
 		Mochi::ThrowNotImplemented();
 	}
 
+    void OpenGLGraphicsDevice::SubmitCommandsCore(CommandListRef commandList, FenceRef fence) {
+        Mochi::ThrowNotImplemented();
+    }
 }
 
 #endif // !defined(VD_EXCLUDE_OPENGL_BACKEND)

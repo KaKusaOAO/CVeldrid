@@ -17,6 +17,7 @@
 #include <iterator>
 #include <cstddef>
 #include <set>
+#include <map>
 
 #if defined(__VD_TARGET_MACOS)
 #include <AppKit/AppKit.h>
@@ -68,7 +69,24 @@ public:
     MTLGPUFamily GetMaxGPUFamily();
 };
 
-typedef std::shared_ptr<MTLFeatureSupport> MTLFeatureSupportRef;
+__MC_DEFINE_REF_TYPE(MTLFeatureSupport)
+
+class MTLCommandList : public CommandList {
+private:
+    id<MTLCommandBuffer> _cb;
+    
+public:
+    id<MTLCommandBuffer> GetCommandBuffer();
+    id<MTLCommandBuffer> Commit();
+};
+
+__MC_DEFINE_REF_TYPE(MTLCommandList)
+
+class MTLFence : public Fence {
+    
+};
+
+__MC_DEFINE_REF_TYPE(MTLFence)
 
 class MTLGraphicsDevice : public GraphicsDevice {
     using Ref = std::shared_ptr<MTLGraphicsDevice>;
@@ -77,11 +95,23 @@ private:
     id<MTLDevice> _device;
     NSString *_deviceName;
     GraphicsApiVersionRef _apiVersion;
+    id<MTLCommandQueue> _commandQueue;
+    
+    std::mutex _submittedCommandsLock;
+    std::map<id<MTLCommandBuffer>, MTLFenceRef> _submittedCBs;
+    id<MTLCommandBuffer> _latestSubmittedCB;
+    
+    std::mutex _resetEventsLock;
     
     MTLFeatureSupportRef _metalFeatures;
     GraphicsDeviceFeatures _features;
     ResourceFactoryRef _resourceFactory;
     ResourceBindingModel _resourceBindingModel;
+    
+    void OnCommandBufferCompleted(id<MTLCommandBuffer> cb);
+    
+protected:
+    void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) override;
     
 public:
     MTLGraphicsDevice(GraphicsDeviceOptions options,
@@ -109,6 +139,7 @@ public:
     MTLResourceFactory(MTLGraphicsDeviceRef device);
     GraphicsBackend GetBackendType() override;
     
+    TextureViewRef CreateTextureViewCore(TextureViewDescription &description) override;
     PipelineRef CreateGraphicsPipelineCore(GraphicsPipelineDescription &description) override;
 };
 

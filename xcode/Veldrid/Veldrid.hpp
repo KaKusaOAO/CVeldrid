@@ -7,6 +7,11 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Veldrid/config.hpp>
+#import <Veldrid/vd.hpp>
+#import <Veldrid/backend_metal.hpp>
+#import <Veldrid/backend_opengl.hpp>
+
 //! Project version number for Veldrid.
 FOUNDATION_EXPORT double VeldridVersionNumber;
 

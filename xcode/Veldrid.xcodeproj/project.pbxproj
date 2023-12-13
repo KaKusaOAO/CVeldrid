@@ -10,11 +10,11 @@
 		22C6F98D2B22EF4C00F5373C /* Veldrid.docc in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F98C2B22EF4C00F5373C /* Veldrid.docc */; };
 		22C6F9932B22EF4D00F5373C /* Veldrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9882B22EF4C00F5373C /* Veldrid.framework */; };
 		22C6F9982B22EF4D00F5373C /* VeldridTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9972B22EF4D00F5373C /* VeldridTests.swift */; };
-		22C6F9992B22EF4D00F5373C /* Veldrid.h in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F98B2B22EF4C00F5373C /* Veldrid.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		22C6F9A82B22EFFF00F5373C /* vd.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A42B22EFFE00F5373C /* vd.hpp */; };
-		22C6F9A92B22EFFF00F5373C /* config.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A52B22EFFE00F5373C /* config.hpp */; };
-		22C6F9AA2B22EFFF00F5373C /* backend_metal.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A62B22EFFF00F5373C /* backend_metal.hpp */; };
-		22C6F9AB2B22EFFF00F5373C /* backend_opengl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A72B22EFFF00F5373C /* backend_opengl.hpp */; };
+		22C6F9992B22EF4D00F5373C /* Veldrid.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F98B2B22EF4C00F5373C /* Veldrid.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		22C6F9A82B22EFFF00F5373C /* vd.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A42B22EFFE00F5373C /* vd.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		22C6F9A92B22EFFF00F5373C /* config.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A52B22EFFE00F5373C /* config.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		22C6F9AA2B22EFFF00F5373C /* backend_metal.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A62B22EFFF00F5373C /* backend_metal.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		22C6F9AB2B22EFFF00F5373C /* backend_opengl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22C6F9A72B22EFFF00F5373C /* backend_opengl.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		22C6F9AF2B22F00D00F5373C /* vd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9AD2B22F00D00F5373C /* vd.cpp */; };
 		22C6F9B22B22F02500F5373C /* backend_opengl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9B02B22F02500F5373C /* backend_opengl.cpp */; };
 		22C6F9B32B22F02500F5373C /* backend_metal.mm in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9B12B22F02500F5373C /* backend_metal.mm */; };
@@ -67,7 +67,7 @@
 
 /* Begin PBXFileReference section */
 		22C6F9882B22EF4C00F5373C /* Veldrid.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Veldrid.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		22C6F98B2B22EF4C00F5373C /* Veldrid.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Veldrid.h; sourceTree = "<group>"; };
+		22C6F98B2B22EF4C00F5373C /* Veldrid.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Veldrid.hpp; sourceTree = "<group>"; };
 		22C6F98C2B22EF4C00F5373C /* Veldrid.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Veldrid.docc; sourceTree = "<group>"; };
 		22C6F9922B22EF4D00F5373C /* VeldridTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VeldridTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22C6F9972B22EF4D00F5373C /* VeldridTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VeldridTests.swift; sourceTree = "<group>"; };
@@ -137,7 +137,7 @@
 		22C6F98A2B22EF4C00F5373C /* Veldrid */ = {
 			isa = PBXGroup;
 			children = (
-				22C6F98B2B22EF4C00F5373C /* Veldrid.h */,
+				22C6F98B2B22EF4C00F5373C /* Veldrid.hpp */,
 				22C6F98C2B22EF4C00F5373C /* Veldrid.docc */,
 			);
 			path = Veldrid;
@@ -204,7 +204,7 @@
 				22C6F9A92B22EFFF00F5373C /* config.hpp in Headers */,
 				22C6F9AA2B22EFFF00F5373C /* backend_metal.hpp in Headers */,
 				22C6F9A82B22EFFF00F5373C /* vd.hpp in Headers */,
-				22C6F9992B22EF4D00F5373C /* Veldrid.h in Headers */,
+				22C6F9992B22EF4D00F5373C /* Veldrid.hpp in Headers */,
 				22C6F9AB2B22EFFF00F5373C /* backend_opengl.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

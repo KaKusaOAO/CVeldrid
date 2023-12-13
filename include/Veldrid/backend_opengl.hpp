@@ -218,6 +218,8 @@ namespace vd {
 			Mochi::Bool IsClipSpaceYInverted() override;
 			ResourceFactoryRef GetResourceFactory() override;
 			GraphicsDeviceFeatures GetFeatures() override;
+            
+            void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) override;
 	};
 
 }

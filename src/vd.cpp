@@ -11,8 +11,6 @@
 
 namespace vd {
 
-// MARK: -
-
 VeldridException::VeldridException() {}
 VeldridException::VeldridException(std::string message) : _message(message) {}
 VeldridException::VeldridException(std::string message, std::exception& inner)
@@ -63,6 +61,28 @@ SwapchainSourceRef SwapchainSource::CreateUIKit(void *uiView) {
 
 Mochi::Bool OutputAttachmentDescription::operator==(const OutputAttachmentDescription &other) {
     return Format == other.Format;
+}
+
+// MARK: -
+
+OutputDescription OutputDescription::CreateFromFramebuffer(FramebufferRef fb) {
+    TextureSampleCount sampleCount = static_cast<TextureSampleCount>(0);
+    std::optional<OutputAttachmentDescription> depthAttachment;
+    
+    if (fb->GetDepthTarget().has_value()) {
+        depthAttachment = std::optional<OutputAttachmentDescription>({
+            { fb->GetDepthTarget().value().Target->GetFormat() }
+        });
+        sampleCount = fb->GetDepthTarget().value().Target->GetSampleCount();
+    }
+    
+    std::vector<OutputAttachmentDescription> colorAttachments;
+    for (auto attachment : fb->GetColorTargets()) {
+        colorAttachments.push_back({ attachment.Target->GetFormat() });
+        sampleCount = attachment.Target->GetSampleCount();
+    }
+    
+    return { depthAttachment, colorAttachments, sampleCount };
 }
 
 // MARK: -
@@ -127,8 +147,168 @@ Pipeline::Pipeline(std::vector<ResourceLayoutRef> resourceLayouts) {
 
 // MARK: -
 
+TextureDescription TextureDescription::Texture1D(Mochi::UInt32 width, Mochi::UInt32 mipLevels,
+                                                 Mochi::UInt32 arrayLayers, PixelFormat format, TextureUsage usage) {
+    return {
+        width, 1, 1,
+        mipLevels, arrayLayers, format, usage,
+        TextureType::Texture1D, TextureSampleCount::Count1
+    };
+}
+
+TextureDescription TextureDescription::Texture2D(Mochi::UInt32 width, Mochi::UInt32 height,
+                                                 Mochi::UInt32 mipLevels, Mochi::UInt32 arrayLayers,
+                                                 PixelFormat format, TextureUsage usage) {
+    return {
+        width, height, 1,
+        mipLevels, arrayLayers, format, usage,
+        TextureType::Texture2D, TextureSampleCount::Count1
+    };
+}
+
+TextureDescription TextureDescription::Texture2D(Mochi::UInt32 width, Mochi::UInt32 height,
+                                                 Mochi::UInt32 mipLevels, Mochi::UInt32 arrayLayers,
+                                                 PixelFormat format, TextureUsage usage, TextureSampleCount sampleCount) {
+    return {
+        width, height, 1,
+        mipLevels, arrayLayers, format, usage,
+        TextureType::Texture2D, sampleCount
+    };
+}
+
+TextureDescription TextureDescription::Texture3D(Mochi::UInt32 width, Mochi::UInt32 height, Mochi::UInt32 depth,
+                                                 Mochi::UInt32 mipLevels, PixelFormat format, TextureUsage usage) {
+    return {
+        width, height, depth,
+        mipLevels, 1, format, usage,
+        TextureType::Texture3D, TextureSampleCount::Count1
+    };
+}
+
+// MARK: -
+
+Mochi::UInt32 Texture::CalculateSubresource(Mochi::UInt32 mipLevel, Mochi::UInt32 arrayLayer) {
+    return arrayLayer * GetMipLevels() + mipLevel;
+}
+
+TextureViewRef Texture::GetFullTextureView(GraphicsDeviceRef gd) {
+    std::lock_guard<std::mutex> lock(_fullTextureViewLock);
+    if (_fullTextureView == nullptr) {
+        _fullTextureView = CreateFullTextureView(gd);
+    }
+    
+    return _fullTextureView;
+}
+
+TextureViewRef Texture::CreateFullTextureView(GraphicsDeviceRef gd) {
+    return gd->GetResourceFactory()->CreateTextureView(shared_from_this());
+}
+
+void Texture::Dispose() {
+    std::lock_guard<std::mutex> lock(_fullTextureViewLock);
+    if (_fullTextureView) {
+        _fullTextureView->Dispose();
+    }
+    
+    DisposeCore();
+}
+
+// MARK:
+
+FramebufferAttachment::FramebufferAttachment(TextureRef target, Mochi::UInt32 arrayLayer) {
+    Target = target;
+    ArrayLayer = arrayLayer;
+    MipLevel = 0;
+}
+
+FramebufferAttachment::FramebufferAttachment(TextureRef target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel) {
+    Target = target;
+    ArrayLayer = arrayLayer;
+    MipLevel = mipLevel;
+}
+
+// MARK:
+
+FramebufferAttachmentDescription::FramebufferAttachmentDescription(TextureRef target, Mochi::UInt32 arrayLayer) {
+    Target = target;
+    ArrayLayer = arrayLayer;
+    MipLevel = 0;
+}
+
+FramebufferAttachmentDescription::FramebufferAttachmentDescription(TextureRef target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel) {
+    Target = target;
+    ArrayLayer = arrayLayer;
+    MipLevel = mipLevel;
+}
+
+// MARK: -
+
+Framebuffer::Framebuffer() {}
+Framebuffer::Framebuffer(std::optional<FramebufferAttachmentDescription> depthTargetDesc,
+                         std::vector<FramebufferAttachmentDescription> colorTargetDescs) {
+    if (depthTargetDesc.has_value()) {
+        auto depthAttachment = depthTargetDesc.value();
+        _depthTarget = FramebufferAttachment(depthAttachment.Target,
+                                             depthAttachment.ArrayLayer,
+                                             depthAttachment.MipLevel);
+    }
+    
+    _colorTargets = std::vector<FramebufferAttachment>();
+    for (auto desc : colorTargetDescs) {
+        _colorTargets.push_back(FramebufferAttachment(desc.Target,
+                                                      desc.ArrayLayer,
+                                                      desc.MipLevel));
+    }
+}
+
+void Framebuffer::InitializeComponent() {
+    _outputDescription = OutputDescription::CreateFromFramebuffer(shared_from_this());
+}
+
+std::optional<FramebufferAttachment> Framebuffer::GetDepthTarget() { return _depthTarget; }
+std::vector<FramebufferAttachment> Framebuffer::GetColorTargets() { return _colorTargets; }
+OutputDescription Framebuffer::GetOutputDescription() { return _outputDescription; }
+
+// MARK: -
+
+TextureViewDescription::TextureViewDescription(TextureRef target) {
+    Target = target;
+    BaseMipLevel = 0;
+    MipLevels = target->GetMipLevels();
+    BaseArrayLayer = 0;
+    ArrayLayers = target->GetArrayLayers();
+    Format = target->GetFormat();
+}
+
+// MARK: -
+
 ResourceFactory::ResourceFactory(GraphicsDeviceFeatures features)
 : _features(features) {}
+
+TextureViewRef ResourceFactory::CreateTextureView(TextureRef target) {
+    TextureViewDescription desc(target);
+    return CreateTextureView(desc);
+}
+
+TextureViewRef ResourceFactory::CreateTextureView(TextureViewDescription &description) {
+#if defined(VD_VALIDATE_USAGE)
+    if (description.MipLevels == 0 ||
+        description.ArrayLayers == 0 ||
+        (description.BaseMipLevel + description.MipLevels) > description.Target->GetMipLevels() ||
+        (description.BaseArrayLayer + description.ArrayLayers) > description.Target->GetArrayLayers()) {
+        throw VeldridException("TextureView mip level and array layer range must be contained in the target Texture.");
+    }
+    
+    if (!(description.Target->GetUsage() & TextureUsage::Sampled) &&
+        !(description.Target->GetUsage() & TextureUsage::Storage)) {
+        throw VeldridException("To create a TextureView, the target texture must have either Sampled or Storage usage flags.");
+    }
+    
+    // TODO: More validations
+#endif // defined(VD_VALIDATE_USAGE)
+    
+    return CreateTextureViewCore(description);
+}
 
 PipelineRef ResourceFactory::CreateGraphicsPipeline(GraphicsPipelineDescription &description) {
 #if defined(VD_VALIDATE_USAGE)
@@ -153,9 +333,16 @@ void GraphicsDevice::PostDeviceCreated() {
     
 }
 
-[[noreturn]] inline void ThrowPlatformExcludedException(std::string name) {
-    throw VeldridException(name + " support has not been included in this configuration of Veldrid");
+[[noreturn]] inline void ThrowPlatformExcludedException(const std::string name) {
+    throw VeldridException(name + " support has not been included in this configuration of Veldrid.");
 }
+
+#if !defined(VD_EXCLUDE_D3D11_BACKEND)
+#else
+std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateD3D11(GraphicsDeviceOptions options, ...) {
+    ThrowPlatformExcludedException("DirectX 11");
+}
+#endif // !defined(VD_EXCLUDE_D3D11_BACKEND)
 
 #if !defined(VD_EXCLUDE_OPENGL_BACKEND)
 std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateOpenGL(GraphicsDeviceOptions options,

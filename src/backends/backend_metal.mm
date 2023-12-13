@@ -73,21 +73,33 @@ MTLFeatureSupport::MTLFeatureSupport(id<MTLDevice> device) {
             _maxGPUFamily = family;
         }
     }
-        
+    
     _isMacOS = IsSupported(MTLGPUFamilyMac1) ||
-               IsSupported(MTLGPUFamilyMac2) ||
-               IsSupported(MTLGPUFamilyMacCatalyst1) ||
-               IsSupported(MTLGPUFamilyMacCatalyst2);
+    IsSupported(MTLGPUFamilyMac2) ||
+    IsSupported(MTLGPUFamilyMacCatalyst1) ||
+    IsSupported(MTLGPUFamilyMacCatalyst2);
 }
 
 Mochi::Bool MTLFeatureSupport::IsDrawBaseVertexInstanceSupported() {
     return IsSupported(MTLGPUFamilyApple2) ||
-           IsSupported(MTLGPUFamilyApple3) ||
-           IsSupported(MTLGPUFamilyApple4) ||
-           _isMacOS;
+    IsSupported(MTLGPUFamilyApple3) ||
+    IsSupported(MTLGPUFamilyApple4) ||
+    _isMacOS;
 }
 
-// MARK: - MTLGraphicsDevice
+// MARK: -
+
+id<MTLCommandBuffer> MTLCommandList::GetCommandBuffer() { return _cb; }
+
+id<MTLCommandBuffer> MTLCommandList::Commit() {
+    [_cb commit];
+    
+    id<MTLCommandBuffer> ret = _cb;
+    _cb = 0;
+    return ret;
+}
+
+// MARK: -
 
 MTLGraphicsDevice::MTLGraphicsDevice(GraphicsDeviceOptions options,
                                      std::optional<SwapchainDescription> swapchainDesc) {
@@ -144,20 +156,43 @@ ResourceFactoryRef MTLGraphicsDevice::GetResourceFactory() { return _resourceFac
 GraphicsDeviceFeatures MTLGraphicsDevice::GetFeatures() { return _features; }
 ResourceBindingModel MTLGraphicsDevice::GetResourceBindingModel() { return _resourceBindingModel; }
 
-// MARK: - MTLResourceFactory
+void MTLGraphicsDevice::SubmitCommandsCore(CommandListRef commandList, FenceRef fence) {
+    auto mtlCL = vd::AssertSubType<MTLCommandList>(commandList);
+    [mtlCL->GetCommandBuffer() addCompletedHandler:^(id<MTLCommandBuffer> _Nonnull cb) {
+        OnCommandBufferCompleted(cb);
+    }];
+    
+    std::lock_guard<std::mutex> lock(_submittedCommandsLock);
+    if (fence) {
+        auto mtlFence = vd::AssertSubType<MTLFence>(fence);
+        _submittedCBs.insert({ mtlCL->GetCommandBuffer(), mtlFence });
+    }
+    
+    _latestSubmittedCB = mtlCL->Commit();
+}
+
+void MTLGraphicsDevice::OnCommandBufferCompleted(id<MTLCommandBuffer> cb) {
+    Mochi::ThrowNotImplemented();
+}
+
+// MARK: -
 
 MTLResourceFactory::MTLResourceFactory(MTLGraphicsDeviceRef device)
 : ResourceFactory(device->GetFeatures()), _gd(device) {}
 
 GraphicsBackend MTLResourceFactory::GetBackendType() { return GraphicsBackend::Metal; }
 
+TextureViewRef MTLResourceFactory::CreateTextureViewCore(TextureViewDescription &description) {
+    Mochi::ThrowNotImplemented();
+}
+
 PipelineRef MTLResourceFactory::CreateGraphicsPipelineCore(GraphicsPipelineDescription &description) {
     return std::make_shared<MTLPipeline>(description, _gd);
 }
 
-// MARK: - MTLPipeline
+// MARK: -
 
-MTLPipeline::MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDeviceRef gd) 
+MTLPipeline::MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDeviceRef gd)
 : Pipeline(description) {
     
 }
