@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\..\src\backends\backend_d3d11.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\backends\backend_vk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\Veldrid\backend_metal.hpp">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Veldrid\backend_d3d11.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\Veldrid\backend_vk.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -43,6 +43,54 @@ Mochi::Bool GraphicsApiVersion::TryParseGLVersion(std::string versionString, Gra
     return false;
 }
 
+GraphicsApiVersionRef GraphicsApiVersion::CreateRef(int major, int minor, int subminor, int patch) {
+    return std::make_shared<GraphicsApiVersion>(major, minor, subminor, patch);
+}
+
+// MARK: -
+
+Mochi::UInt32 GetSizeInBytes(PixelFormat format) {
+    switch (format) {
+    case PixelFormat::R8_UNorm:
+    case PixelFormat::R8_SNorm:
+    case PixelFormat::R8_UInt:
+    case PixelFormat::R8_SInt:
+        return 1;
+
+    case PixelFormat::R16_UNorm:
+    case PixelFormat::R16_SNorm:
+    case PixelFormat::R16_UInt:
+    case PixelFormat::R16_SInt:
+    case PixelFormat::R16_Float:
+    case PixelFormat::R8_G8_UNorm:
+    case PixelFormat::R8_G8_SNorm:
+    case PixelFormat::R8_G8_UInt:
+    case PixelFormat::R8_G8_SInt:
+        return 2;
+    }
+
+    throw Illegal::Value<PixelFormat>();
+}
+
+Mochi::Bool IsCompressedFormat(PixelFormat format) {
+    Mochi::ThrowNotImplemented();
+}
+
+// MARK: -
+
+Mochi::UInt32 GetSizeInBytes(VertexElementFormat format) {
+    switch (format) {
+    case VertexElementFormat::Byte2_Norm:
+    case VertexElementFormat::Byte2:
+    case VertexElementFormat::SByte2_Norm:
+    case VertexElementFormat::SByte2:
+    case VertexElementFormat::Half1:
+        return 2;
+    }
+
+    throw Illegal::Value<VertexElementFormat>();
+}
+
 // MARK: -
 
 #if defined(__APPLE__)
@@ -57,10 +105,27 @@ SwapchainSourceRef SwapchainSource::CreateUIKit(void *uiView) {
 #endif // defined(__VD_TARGET_MACOS)
 #endif // defined(__APPLE__)
 
+#if defined(_WIN32)
+
+Win32SwapchainSource::Win32SwapchainSource(void* hwnd, void* hInstance) : _hwnd(hwnd), _hInstance(hInstance) {}
+void* Win32SwapchainSource::GetHwnd() { return _hwnd; }
+void* Win32SwapchainSource::GetHInstance() { return _hInstance; }
+
+#endif // defined(_WIN32)
+
 // MARK: -
 
 Mochi::Bool OutputAttachmentDescription::operator==(const OutputAttachmentDescription &other) {
     return Format == other.Format;
+}
+
+// MARK: -
+
+Mochi::Bool BufferDescription::operator==(const BufferDescription& other) {
+    return SizeInBytes == other.SizeInBytes &&
+           Usage == other.Usage &&
+           StructureByteStride == other.StructureByteStride &&
+           RawBuffer == other.RawBuffer;
 }
 
 // MARK: -
@@ -124,11 +189,28 @@ ResourceLayout::ResourceLayout(ResourceLayoutDescription& description) {
     _description = description;
     
     for (auto element : description.Elements) {
-        if (element.Options & ResourceLayoutElementOptions::DynamicBinding) {
+        if (element.Options.HasFlag(ResourceLayoutElementOptionsBits::DynamicBinding)) {
             _dynamicBufferCount++;
         }
     }
 #endif // defined(VD_VALIDATE_USAGE)
+}
+
+// MARK: -
+
+Mochi::Bool VertexElementDescription::operator==(const VertexElementDescription& other) {
+    return Name == other.Name &&
+           Format == other.Format &&
+           Semantic == other.Semantic &&
+           Offset == other.Offset;
+}
+
+// MARK: -
+
+Mochi::Bool VertexLayoutDescription::operator==(const VertexLayoutDescription& other) {
+    return Stride == other.Stride &&
+           Elements == other.Elements &&
+           InstanceStepRate == other.InstanceStepRate;
 }
 
 // MARK: -
@@ -139,10 +221,10 @@ Pipeline::Pipeline(GraphicsPipelineDescription& description) : Pipeline(descript
 #endif // defined(VD_VALIDATE_USAGE)
 }
 
-Pipeline::Pipeline(std::vector<ResourceLayoutRef> resourceLayouts) {
+Pipeline::Pipeline(std::vector<ResourceLayout::Ref> resourceLayouts) {
 #if defined(VD_VALIDATE_USAGE)
-    // TODO: Copy resource layouts and store
-#endif
+    _resourceLayouts = resourceLayouts;
+#endif // defined(VD_VALIDATE_USAGE)
 }
 
 // MARK: -
@@ -312,7 +394,7 @@ TextureViewRef ResourceFactory::CreateTextureView(TextureViewDescription &descri
 
 PipelineRef ResourceFactory::CreateGraphicsPipeline(GraphicsPipelineDescription &description) {
 #if defined(VD_VALIDATE_USAGE)
-    if (!(_features & GraphicsDeviceFeatures::IndependentBlend)) {
+    if (!_features.HasFlag(GraphicsDeviceFeaturesBits::IndependentBlend)) {
         if (description.BlendState.AttachmentStates.size() > 0) {
             auto attachmentState = description.BlendState.AttachmentStates[0];
             for (int i = 1; i < description.BlendState.AttachmentStates.size(); i++) {

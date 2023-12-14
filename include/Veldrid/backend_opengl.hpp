@@ -24,18 +24,18 @@
 #else
 #   include <windows.h>
 #   include <GL/GL.h>
-#   pragma comment(lib,"opengl32.lib")
+#   pragma comment(lib, "opengl32.lib")
 #endif // defined(__APPLE__)
 
 // MARK: - Additional data types from https://www.khronos.org/opengl/wiki/OpenGL_Type
 
 #if !defined(_WIN32)
-#   define WINAPI
+#   define __VD_STDCALL
 #   if defined(__APPLE__)
 typedef double GLdouble;
 #   endif // defined(__APPLE__)
 #else
-#   define WINAPI __stdcall
+#   define __VD_STDCALL __stdcall
 typedef void* GLintptr;
 typedef void* GLsizeiptr;
 typedef void* GLsync;
@@ -97,13 +97,27 @@ namespace vd {
         __VD_DEFINE_GL(glGetShaderInfoLog, void, GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog); \
         __VD_DEFINE_GL(glDeleteShader, void, GLuint shader); \
         __VD_DEFINE_GL(glGenSamplers, void, GLsizei n, GLuint *samplers); \
+        __VD_DEFINE_GL(glSamplerParameterf, void, GLuint sampler, GLenum pname, GLfloat param) \
+        __VD_DEFINE_GL(glSamplerParameteri, void, GLuint sampler, GLenum pname, GLint param) \
+        __VD_DEFINE_GL(glSamplerParameterfv, void, GLuint sampler, GLenum pname, const GLfloat* params) \
+        __VD_DEFINE_GL(glSamplerParameteriv, void, GLuint sampler, GLenum pname, const GLint* params) \
+        __VD_DEFINE_GL(glBindSampler, void, GLuint unit, GLuint sampler) \
+        __VD_DEFINE_GL(glDeleteSamplers, void, GLsizei n, const GLuint* samplers) \
+        __VD_DEFINE_GL(glColorMask, void, GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha) \
+        __VD_DEFINE_GL(glColorMaski, void, GLuint buf, GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha) \
+        __VD_DEFINE_GL(glBlendFuncSeparate, void, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) \
+        __VD_DEFINE_GL(glBlendFuncSeparatei, void, GLuint buf, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) \
+        __VD_DEFINE_GL(glEnable, void, GLenum cap) \
+        __VD_DEFINE_GL(glEnablei, void, GLenum cap, GLuint index) \
+        __VD_DEFINE_GL(glDisable, void, GLenum cap) \
+        __VD_DEFINE_GL(glDisablei, void, GLenum cap, GLuint index) \
         __VD_DEFINE_GL(glPushGroupMarker, void, GLsizei length, const GLchar *marker); \
         __VD_DEFINE_GL(glPopGroupMarker, void); \
         __VD_DEFINE_GL(glCreateProgram, GLuint);
         
 #define __VD_DEFINE_GL(name, ret, ...) \
     public: \
-        using name##_t = ret ( WINAPI *)(__VA_ARGS__); \
+        using name##_t = ret ( __VD_STDCALL *)(__VA_ARGS__); \
         static ret name (__VA_ARGS__); \
     private: \
         static name##_t _p_##name;
@@ -111,19 +125,44 @@ namespace vd {
         __VD_DEFINE_GL_FUNCS
         
 #undef __VD_DEFINE_GL
+#undef __VD_STDCALL
+
+    public:
+        using FnGetProcAddress = std::function<void* (std::string)>;
 
     private:
-        static std::function<void* (std::string)> _getProcAddress;
+        static std::unordered_map<std::string, void*> _funcMap;
+        static glClearDepthf_t _p_glClearDepthf_Compat;
+        static FnGetProcAddress _getProcAddress;
 
         template <class T>
         static void LoadFunction(std::string name, T& field) {
-            auto ptr = _getProcAddress(name);
-            field = (T)ptr;
+            void* ptr = _getProcAddress(name);
+            _funcMap[name] = ptr;
+            field = (T) ptr;
         }
 
     public:
+        static void glClearDepth_Compat(GLfloat depth);
         static void CheckLastError();
-        static void LoadAllFunctions(void* context, std::function<void* (std::string)> getProcAddress, Mochi::Bool gles);
+        static void LoadAllFunctions(void* context, FnGetProcAddress getProcAddress, Mochi::Bool gles);
+        
+        template <typename Ret, typename... Args>
+        static Ret Call(std::string name, Args... args) {
+            auto iter = _funcMap.find(name);
+            void* funcPtr;
+
+            if (iter == _funcMap.end()) {
+                funcPtr = LoadFunction(name, funcPtr);
+                _funcMap[name] = funcPtr;
+            }
+            else {
+                funcPtr = iter->second;
+            }
+
+            auto func = reinterpret_cast<Ret(Args...)>(funcPtr);
+            return func(args...);
+        }
     };
 
     class IOpenGLDeferredResource {
@@ -171,55 +210,55 @@ namespace vd {
 
     __MC_DEFINE_REF_TYPE(OpenGLPlatformInfo)
 
-        class OpenGLPipeline : public Pipeline, public IOpenGLDeferredResource {
-        private:
-            GLuint _program;
-            Mochi::Bool _disposeRequested;
-            Mochi::Bool _disposed;
-            Mochi::Bool _created;
+    class OpenGLPipeline : public Pipeline, public IOpenGLDeferredResource {
+    private:
+        GLuint _program;
+        Mochi::Bool _disposeRequested;
+        Mochi::Bool _disposed;
+        Mochi::Bool _created;
 
-            void CreateGLResources();
-            void CreateGraphicsGLResources();
-            void CreateComputeGLResources();
-        public:
-            Mochi::Bool IsCreated() override;
-            void EnsureResourceCreated() override;
-            void DestroyGLResources() override;
+        void CreateGLResources();
+        void CreateGraphicsGLResources();
+        void CreateComputeGLResources();
+    public:
+        Mochi::Bool IsCreated() override;
+        void EnsureResourceCreated() override;
+        void DestroyGLResources() override;
     };
 
     __MC_DEFINE_REF_TYPE(OpenGLPipeline)
 
-        class OpenGLGraphicsDevice : public GraphicsDevice {
-        private:
-            ResourceFactoryRef _resourceFactory;
-            std::string _deviceName;
-            std::string _vendorName;
-            std::string _version;
-            std::string _shadingLanguageVersion;
-            GraphicsApiVersionRef _apiVersion;
-            GraphicsBackend _backendType;
-            GraphicsDeviceFeatures _features;
-            GLuint _vao;
-            void* _glContext;
+    class OpenGLGraphicsDevice : public GraphicsDevice {
+    private:
+        ResourceFactoryRef _resourceFactory;
+        std::string _deviceName;
+        std::string _vendorName;
+        std::string _version;
+        std::string _shadingLanguageVersion;
+        GraphicsApiVersionRef _apiVersion;
+        GraphicsBackend _backendType;
+        GraphicsDeviceFeatures _features;
+        GLuint _vao;
+        void* _glContext;
 
-        public:
-            OpenGLGraphicsDevice(GraphicsDeviceOptions options,
-                OpenGLPlatformInfoRef info,
-                Mochi::UInt32 width,
-                Mochi::UInt32 height);
+    public:
+        OpenGLGraphicsDevice(GraphicsDeviceOptions options,
+                             OpenGLPlatformInfoRef info,
+                             Mochi::UInt32 width,
+                             Mochi::UInt32 height);
 
-            void InitializeComponents() override;
-            std::string GetDeviceName() override;
-            std::string GetVendorName() override;
-            GraphicsBackend GetBackendType() override;
-            GraphicsApiVersionRef GetApiVersion() override;
-            Mochi::Bool IsUvOriginTopLeft() override;
-            Mochi::Bool IsDepthRangeZeroToOne() override;
-            Mochi::Bool IsClipSpaceYInverted() override;
-            ResourceFactoryRef GetResourceFactory() override;
-            GraphicsDeviceFeatures GetFeatures() override;
+        void InitializeComponents() override;
+        std::string GetDeviceName() override;
+        std::string GetVendorName() override;
+        GraphicsBackend GetBackendType() override;
+        GraphicsApiVersionRef GetApiVersion() override;
+        Mochi::Bool IsUvOriginTopLeft() override;
+        Mochi::Bool IsDepthRangeZeroToOne() override;
+        Mochi::Bool IsClipSpaceYInverted() override;
+        ResourceFactoryRef GetResourceFactory() override;
+        GraphicsDeviceFeatures GetFeatures() override;
             
-            void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) override;
+        void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) override;
     };
 
 }

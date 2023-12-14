@@ -29,26 +29,6 @@
 
 namespace vd {
 
-#if defined(__VD_TARGET_MACOS)
-class NSWindowSwapchainSource : public SwapchainSource {
-private:
-    NSWindow *_window;
-    
-public:
-    NSWindowSwapchainSource(NSWindow *window);
-    NSWindow* GetNSWindow();
-};
-#else
-class UIViewSwapchainSource : public SwapchainSource {
-private:
-    UIView *_view;
-    
-public:
-    UIViewSwapchainSource(UIView *view);
-    UIView* GetUIView();
-};
-#endif // TARGET_OS_MAC
-
 class MTLFeatureSupport {
 private:
     std::set<MTLGPUFamily> _supportedFeatureSets;
