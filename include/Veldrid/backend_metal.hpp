@@ -30,14 +30,11 @@
 namespace vd {
 
 class MTLFeatureSupport {
-private:
-    std::set<MTLGPUFamily> _supportedFeatureSets;
-    MTLGPUFamily _maxGPUFamily;
-    Mochi::Bool _isMacOS;
-    
 public:
+    using Ref = vd::Ref<MTLFeatureSupport>;
     using Iterator = std::set<MTLGPUFamily>::iterator;
     using SizeType = std::set<MTLGPUFamily>::size_type;
+    
     Iterator begin();
     Iterator end();
     
@@ -47,87 +44,91 @@ public:
     Mochi::Bool IsMacOS();
     SizeType GetCount();
     MTLGPUFamily GetMaxGPUFamily();
+    
+private:
+    std::set<MTLGPUFamily> _supportedFeatureSets;
+    MTLGPUFamily _maxGPUFamily;
+    Mochi::Bool _isMacOS;
 };
-
-__MC_DEFINE_REF_TYPE(MTLFeatureSupport)
 
 class MTLCommandList : public CommandList {
-private:
-    id<MTLCommandBuffer> _cb;
-    
 public:
+    using Ref = vd::Ref<MTLCommandList>;
+    
     id<MTLCommandBuffer> GetCommandBuffer();
     id<MTLCommandBuffer> Commit();
-};
-
-__MC_DEFINE_REF_TYPE(MTLCommandList)
-
-class MTLFence : public Fence {
-    
-};
-
-__MC_DEFINE_REF_TYPE(MTLFence)
-
-class MTLGraphicsDevice : public GraphicsDevice {
-    using Ref = std::shared_ptr<MTLGraphicsDevice>;
     
 private:
-    id<MTLDevice> _device;
-    NSString *_deviceName;
-    GraphicsApiVersionRef _apiVersion;
-    id<MTLCommandQueue> _commandQueue;
-    
-    std::mutex _submittedCommandsLock;
-    std::map<id<MTLCommandBuffer>, MTLFenceRef> _submittedCBs;
-    id<MTLCommandBuffer> _latestSubmittedCB;
-    
-    std::mutex _resetEventsLock;
-    
-    MTLFeatureSupportRef _metalFeatures;
-    GraphicsDeviceFeatures _features;
-    ResourceFactoryRef _resourceFactory;
-    ResourceBindingModel _resourceBindingModel;
-    
-    void OnCommandBufferCompleted(id<MTLCommandBuffer> cb);
-    
-protected:
-    void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) override;
-    
+    id<MTLCommandBuffer> _cb;
+};
+
+class MTLFence : public Fence {
 public:
+    using Ref = vd::Ref<MTLFence>;
+};
+
+class MTLGraphicsDevice : public GraphicsDevice {
+public:
+    using Ref = vd::Ref<MTLGraphicsDevice>;
+    
     MTLGraphicsDevice(GraphicsDeviceOptions options,
                       std::optional<SwapchainDescription> swapchainDesc);
+    
     void InitializeComponents() override;
     std::string GetDeviceName() override;
     std::string GetVendorName() override;
-    GraphicsApiVersionRef GetApiVersion() override;
+    GraphicsApiVersion::Ref GetApiVersion() override;
     GraphicsBackend GetBackendType() override;
     Mochi::Bool IsUvOriginTopLeft() override;
     Mochi::Bool IsDepthRangeZeroToOne() override;
     Mochi::Bool IsClipSpaceYInverted() override;
     GraphicsDeviceFeatures GetFeatures() override;
-    ResourceFactoryRef GetResourceFactory() override;
+    ResourceFactory::Ref GetResourceFactory() override;
     ResourceBindingModel GetResourceBindingModel();
+    
+private:
+    id<MTLDevice> _device;
+    NSString *_deviceName;
+    GraphicsApiVersion::Ref _apiVersion;
+    id<MTLCommandQueue> _commandQueue;
+    
+    std::mutex _submittedCommandsLock;
+    std::map<id<MTLCommandBuffer>, MTLFence::Ref> _submittedCBs;
+    id<MTLCommandBuffer> _latestSubmittedCB;
+    
+    std::mutex _resetEventsLock;
+    
+    MTLFeatureSupport::Ref _metalFeatures;
+    GraphicsDeviceFeatures _features;
+    ResourceFactory::Ref _resourceFactory;
+    ResourceBindingModel _resourceBindingModel;
+    
+    void OnCommandBufferCompleted(id<MTLCommandBuffer> cb);
+    
+protected:
+    void SubmitCommandsCore(CommandList::Ref commandList, Fence::Ref fence) override;
 };
-
-__MC_DEFINE_REF_TYPE(MTLGraphicsDevice)
 
 class MTLResourceFactory : public ResourceFactory {
-private:
-    MTLGraphicsDeviceRef _gd;
-    
 public:
-    MTLResourceFactory(MTLGraphicsDeviceRef device);
+    using Ref = vd::Ref<MTLResourceFactory>;
+    
+    MTLResourceFactory(MTLGraphicsDevice::Ref device);
     GraphicsBackend GetBackendType() override;
     
-    TextureViewRef CreateTextureViewCore(TextureViewDescription &description) override;
-    PipelineRef CreateGraphicsPipelineCore(GraphicsPipelineDescription &description) override;
+    TextureView::Ref CreateTextureViewCore(TextureViewDescription &description) override;
+    Pipeline::Ref CreateGraphicsPipelineCore(GraphicsPipelineDescription &description) override;
+    
+private:
+    MTLGraphicsDevice::Ref _gd;
 };
-
-__MC_DEFINE_REF_TYPE(MTLResourceFactory)
 
 class MTLPipeline : public Pipeline {
 public:
-    MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDeviceRef gd);
+    using Ref = vd::Ref<MTLPipeline>;
+    
+    MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDevice::Ref gd);
+    
     std::string GetName() override;
     void SetName(std::string name) override;
     Mochi::Bool IsDisposed() override;

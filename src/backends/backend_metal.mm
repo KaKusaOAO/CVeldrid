@@ -14,20 +14,6 @@
 
 namespace vd {
 
-// MARK: - NSWindowSwapchainSource
-
-#if defined(__VD_TARGET_MACOS)
-NSWindowSwapchainSource::NSWindowSwapchainSource(NSWindow *nsWindow)
-: _window(nsWindow) {}
-
-NSWindow* NSWindowSwapchainSource::GetNSWindow() { return _window; }
-#else
-UIViewSwapchainSource::UIViewSwapchainSource(UIView *view)
-: _view(view) {}
-
-UIView* UIViewSwapchainSource::GetUIView() { return _view; }
-#endif // defined(__VD_TARGET_MACOS)
-
 // MARK: - MTLFeatureSupport
 
 MTLGPUFamily MTLGPUFamilies[] = {
@@ -111,28 +97,29 @@ MTLGraphicsDevice::MTLGraphicsDevice(GraphicsDeviceOptions options,
     int minor = (int) _metalFeatures->GetMaxGPUFamily() % 10000;
     _apiVersion = std::make_shared<GraphicsApiVersion>(major, minor, 0, 0);
     
-    _features = (GraphicsDeviceFeatures::ComputeShader |
-                 GraphicsDeviceFeatures::DrawIndirect |
-                 GraphicsDeviceFeatures::DrawIndirectBaseInstance |
-                 GraphicsDeviceFeatures::FillModeWireframe |
-                 GraphicsDeviceFeatures::SamplerAnisotropy |
-                 GraphicsDeviceFeatures::DepthClipDisable |
-                 GraphicsDeviceFeatures::Texture1D |
-                 GraphicsDeviceFeatures::IndependentBlend |
-                 GraphicsDeviceFeatures::StructuredBuffer |
-                 GraphicsDeviceFeatures::SubsetTextureView |
-                 GraphicsDeviceFeatures::CommandListDebugMarkers |
-                 GraphicsDeviceFeatures::BufferRangeBinding);
+    _features = (GraphicsDeviceFeatures() |
+                 GraphicsDeviceFeaturesBits::ComputeShader |
+                 GraphicsDeviceFeaturesBits::DrawIndirect |
+                 GraphicsDeviceFeaturesBits::DrawIndirectBaseInstance |
+                 GraphicsDeviceFeaturesBits::FillModeWireframe |
+                 GraphicsDeviceFeaturesBits::SamplerAnisotropy |
+                 GraphicsDeviceFeaturesBits::DepthClipDisable |
+                 GraphicsDeviceFeaturesBits::Texture1D |
+                 GraphicsDeviceFeaturesBits::IndependentBlend |
+                 GraphicsDeviceFeaturesBits::StructuredBuffer |
+                 GraphicsDeviceFeaturesBits::SubsetTextureView |
+                 GraphicsDeviceFeaturesBits::CommandListDebugMarkers |
+                 GraphicsDeviceFeaturesBits::BufferRangeBinding);
     
     if (_metalFeatures->IsSupported(MTLGPUFamilyMac1)) {
         _features = (_features |
-                     GraphicsDeviceFeatures::MultipleViewports);
+                     GraphicsDeviceFeaturesBits::MultipleViewports);
     }
     
     if (_metalFeatures->IsDrawBaseVertexInstanceSupported()) {
         _features = (_features |
-                     GraphicsDeviceFeatures::DrawBaseVertex |
-                     GraphicsDeviceFeatures::DrawBaseInstance);
+                     GraphicsDeviceFeaturesBits::DrawBaseVertex |
+                     GraphicsDeviceFeaturesBits::DrawBaseInstance);
     }
     
     _resourceBindingModel = options.ResourceBindingModel;
@@ -147,16 +134,16 @@ void MTLGraphicsDevice::InitializeComponents() {
 
 std::string MTLGraphicsDevice::GetDeviceName() { return [_deviceName cStringUsingEncoding:NSUTF8StringEncoding]; }
 std::string MTLGraphicsDevice::GetVendorName() { return "Apple"; }
-GraphicsApiVersionRef MTLGraphicsDevice::GetApiVersion() { return _apiVersion; }
+GraphicsApiVersion::Ref MTLGraphicsDevice::GetApiVersion() { return _apiVersion; }
 GraphicsBackend MTLGraphicsDevice::GetBackendType() { return GraphicsBackend::Metal; }
 Mochi::Bool MTLGraphicsDevice::IsUvOriginTopLeft() { return true; }
 Mochi::Bool MTLGraphicsDevice::IsDepthRangeZeroToOne() { return true; }
 Mochi::Bool MTLGraphicsDevice::IsClipSpaceYInverted() { return false; }
-ResourceFactoryRef MTLGraphicsDevice::GetResourceFactory() { return _resourceFactory; }
+ResourceFactory::Ref MTLGraphicsDevice::GetResourceFactory() { return _resourceFactory; }
 GraphicsDeviceFeatures MTLGraphicsDevice::GetFeatures() { return _features; }
 ResourceBindingModel MTLGraphicsDevice::GetResourceBindingModel() { return _resourceBindingModel; }
 
-void MTLGraphicsDevice::SubmitCommandsCore(CommandListRef commandList, FenceRef fence) {
+void MTLGraphicsDevice::SubmitCommandsCore(CommandList::Ref commandList, Fence::Ref fence) {
     auto mtlCL = vd::AssertSubType<MTLCommandList>(commandList);
     [mtlCL->GetCommandBuffer() addCompletedHandler:^(id<MTLCommandBuffer> _Nonnull cb) {
         OnCommandBufferCompleted(cb);
@@ -177,22 +164,22 @@ void MTLGraphicsDevice::OnCommandBufferCompleted(id<MTLCommandBuffer> cb) {
 
 // MARK: -
 
-MTLResourceFactory::MTLResourceFactory(MTLGraphicsDeviceRef device)
+MTLResourceFactory::MTLResourceFactory(MTLGraphicsDevice::Ref device)
 : ResourceFactory(device->GetFeatures()), _gd(device) {}
 
 GraphicsBackend MTLResourceFactory::GetBackendType() { return GraphicsBackend::Metal; }
 
-TextureViewRef MTLResourceFactory::CreateTextureViewCore(TextureViewDescription &description) {
+TextureView::Ref MTLResourceFactory::CreateTextureViewCore(TextureViewDescription &description) {
     Mochi::ThrowNotImplemented();
 }
 
-PipelineRef MTLResourceFactory::CreateGraphicsPipelineCore(GraphicsPipelineDescription &description) {
-    return std::make_shared<MTLPipeline>(description, _gd);
+Pipeline::Ref MTLResourceFactory::CreateGraphicsPipelineCore(GraphicsPipelineDescription &description) {
+    return Mochi::CreateRef<MTLPipeline>(description, _gd);
 }
 
 // MARK: -
 
-MTLPipeline::MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDeviceRef gd)
+MTLPipeline::MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDevice::Ref gd)
 : Pipeline(description) {
     
 }

@@ -13,6 +13,8 @@
 
 #if !defined(VD_EXCLUDE_OPENGL_BACKEND)
 
+#include <unordered_map>
+
 #if defined(__APPLE__)
 #   define GL_SILENCE_DEPRECATION
 #   define GLES_SILENCE_DEPRECATION
@@ -153,7 +155,7 @@ namespace vd {
             void* funcPtr;
 
             if (iter == _funcMap.end()) {
-                funcPtr = LoadFunction(name, funcPtr);
+                LoadFunction(name, funcPtr);
                 _funcMap[name] = funcPtr;
             }
             else {

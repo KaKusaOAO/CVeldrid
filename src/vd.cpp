@@ -95,13 +95,23 @@ Mochi::UInt32 GetSizeInBytes(VertexElementFormat format) {
 
 #if defined(__APPLE__)
 #if defined(__VD_TARGET_MACOS)
-SwapchainSourceRef SwapchainSource::CreateNSWindow(void *uiView) {
+SwapchainSource::Ref SwapchainSource::CreateNSWindow(void *nsWindow) {
     Mochi::ThrowNotImplemented();
 }
+
+NSWindowSwapchainSource::NSWindowSwapchainSource(NSWindow *nsWindow)
+: _window(nsWindow) {}
+
+NSWindow* NSWindowSwapchainSource::GetNSWindow() { return _window; }
 #else
-SwapchainSourceRef SwapchainSource::CreateUIKit(void *uiView) {
+SwapchainSource::Ref SwapchainSource::CreateUIKit(void *uiView) {
     Mochi::ThrowNotImplemented();
 }
+
+UIViewSwapchainSource::UIViewSwapchainSource(UIView *view)
+: _view(view) {}
+
+UIView* UIViewSwapchainSource::GetUIView() { return _view; }
 #endif // defined(__VD_TARGET_MACOS)
 #endif // defined(__APPLE__)
 
@@ -198,19 +208,19 @@ ResourceLayout::ResourceLayout(ResourceLayoutDescription& description) {
 
 // MARK: -
 
-Mochi::Bool VertexElementDescription::operator==(const VertexElementDescription& other) {
-    return Name == other.Name &&
-           Format == other.Format &&
-           Semantic == other.Semantic &&
-           Offset == other.Offset;
+Mochi::Bool operator==(const VertexElementDescription& a, const VertexElementDescription& b) {
+    return a.Name     == b.Name &&
+           a.Format   == b.Format &&
+           a.Semantic == b.Semantic &&
+           a.Offset   == b.Offset;
 }
 
 // MARK: -
 
-Mochi::Bool VertexLayoutDescription::operator==(const VertexLayoutDescription& other) {
-    return Stride == other.Stride &&
-           Elements == other.Elements &&
-           InstanceStepRate == other.InstanceStepRate;
+Mochi::Bool operator==(const VertexLayoutDescription& a, const VertexLayoutDescription& b) {
+    return a.Stride           == b.Stride &&
+           a.Elements         == b.Elements &&
+           a.InstanceStepRate == b.InstanceStepRate;
 }
 
 // MARK: -

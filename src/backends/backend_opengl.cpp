@@ -14,6 +14,8 @@
 #endif
 
 namespace vd {
+    GL::glClearDepthf_t  GL::_p_glClearDepthf_Compat;
+    GL::FnGetProcAddress GL::_getProcAddress;
     std::unordered_map<std::string, void*> GL::_funcMap = std::unordered_map<std::string, void*>();
 
 #define __VD_DEFINE_GL(name, ret, ...) \

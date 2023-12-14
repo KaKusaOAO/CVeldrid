@@ -200,7 +200,7 @@ public:
 
 class NSWindowSwapchainSource : public SwapchainSource {
 public:
-    using Ref = __MC_REF_TYPE(NSWindowSwapchainSource);
+    using Ref = vd::Ref<NSWindowSwapchainSource>;
 
     NSWindowSwapchainSource(NSWindow* window);
     NSWindow* GetNSWindow();
@@ -213,7 +213,7 @@ private:
 
 class UIViewSwapchainSource : public SwapchainSource {
 public:
-    using Ref = __MC_REF_TYPE(UIViewSwapchainSource);
+    using Ref = vd::Ref<UIViewSwapchainSource>;
 
     UIViewSwapchainSource(UIView* view);
     UIView* GetUIView();
@@ -244,12 +244,12 @@ private:
 
 class IMappableResource {
 public:
-    using Ref = Ref<IMappableResource>;
+    using Ref = vd::Ref<IMappableResource>;
 };
 
 class IBindableResource {
 public:
-    using Ref = Ref<IBindableResource>;
+    using Ref = vd::Ref<IBindableResource>;
 };
 
 struct SwapchainDescription {
@@ -267,7 +267,8 @@ public:
     using MaskType = std::underlying_type<BitType>::type;
 
     Flags() : _mask(0) {}
-    Flags(const BitType& value) : _mask(value) {}
+    Flags(const BitType& value) : _mask((MaskType) value) {}
+    Flags(const MaskType& value) : _mask(value) {}
 
     operator BitType() { return _mask; }
 
@@ -581,7 +582,7 @@ struct VertexElementDescription {
     VertexElementFormat Format;
     Mochi::UInt32 Offset;
 
-    Mochi::Bool operator==(const VertexElementDescription& other);
+    friend Mochi::Bool operator==(const VertexElementDescription& a, const VertexElementDescription& b);
 };
 
 struct VertexLayoutDescription {
@@ -589,7 +590,7 @@ struct VertexLayoutDescription {
     std::vector<VertexElementDescription> Elements;
     Mochi::UInt32 InstanceStepRate;
 
-    Mochi::Bool operator==(const VertexLayoutDescription& other);
+    friend Mochi::Bool operator==(const VertexLayoutDescription& a, const VertexLayoutDescription& b);
 };
 
 class Framebuffer;
