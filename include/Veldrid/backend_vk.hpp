@@ -11,27 +11,25 @@
 
 #include <Veldrid/vd.hpp>
 
-
-#define VK_USE_PLATFORM_WIN32_KHR
-#define VK_USE_PLATFORM_METAL_EXT
-#define VK_USE_PLATFORM_MACOS_MVK
-#define VK_USE_PLATFORM_IOS_MVK
 #define VK_USE_PLATFORM_ANDROID_KHR
 
 #include <vulkan/vulkan.hpp>
 
-
-// #if defined (_WIN32)
+#if defined (_WIN32)
+#   define VK_USE_PLATFORM_WIN32_KHR
 #	include <vulkan/vulkan_win32.h>
-// #elif defined(__APPLE__)
+#elif defined(__APPLE__)
+#   define VK_USE_PLATFORM_METAL_EXT
+#   define VK_USE_PLATFORM_MACOS_MVK
+#   define VK_USE_PLATFORM_IOS_MVK
 #	include <vulkan/vulkan_metal.h>
 #	include <vulkan/vulkan_macos.h>
 #	include <vulkan/vulkan_ios.h>
 // #elif defined(__linux__)
 // #	include <vulkan/vulkan_xcb.h>
 // #elif defined(__ANDROID__)
-#	include <vulkan/vulkan_android.h>
-// #endif
+// #	include <vulkan/vulkan_android.h>
+#endif
 // #include <vulkan/vulkan_xlib.h>
 // #include <vulkan/vulkan_wayland.h>
 
@@ -39,6 +37,11 @@
 #include <list>
 
 namespace vd {
+
+    class VkDeviceMemoryManager : public Mochi::IDisposable {
+    public:
+        using Ref = vd::Ref<VkDeviceMemoryManager>;
+    };
 
     class VkGraphicsDevice : public GraphicsDevice {
     public:
@@ -49,6 +52,10 @@ namespace vd {
         VkGraphicsDevice(GraphicsDeviceOptions options,
                          std::optional<SwapchainDescription> scDesc,
                          VulkanDeviceOptions vkOptions);
+        
+        void InitializeComponents(GraphicsDeviceOptions options,
+                                  std::optional<SwapchainDescription> scDesc,
+                                  VulkanDeviceOptions vkOptions);
 
         Mochi::Bool HasSurfaceExtension(std::string extension);
         void EnableDebugCallback(vk::DebugReportFlagsEXT flags = vk::DebugReportFlagBitsEXT::eWarning | vk::DebugReportFlagBitsEXT::eError);
@@ -62,6 +69,10 @@ namespace vd {
         std::string _vendorName;
         GraphicsApiVersion::Ref _apiVersion;
         std::string _driverName;
+        std::string _driverInfo;
+        vk::PhysicalDeviceProperties _physicalDeviceProperties;
+        vk::PhysicalDeviceFeatures _physicalDeviceFeatures;
+        vk::PhysicalDeviceMemoryProperties _physicalDeviceMemoryProperties;
 
         std::vector<std::string> _surfaceExtensions;
 
@@ -77,6 +88,7 @@ namespace vd {
         Mochi::Bool _useKHR_getPhysicalDeviceProperties2;
 
         void CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options);
+        void CreatePhysicalDevice();
 
         template <class T = void*>
         T GetInstanceProcAddr(std::string name) {

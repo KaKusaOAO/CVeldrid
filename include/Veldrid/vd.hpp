@@ -865,8 +865,6 @@ class GraphicsDevice :
 public Mochi::IDisposable, public std::enable_shared_from_this<GraphicsDevice> {
 public:
     using Ref = vd::Ref<GraphicsDevice>;
-
-    virtual void InitializeComponents() = 0;
     
     virtual std::string GetDeviceName() = 0;
     virtual std::string GetVendorName() = 0;

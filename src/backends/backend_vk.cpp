@@ -5,6 +5,7 @@
 #include <Mochi/logging.hpp>
 #include <set>
 #include <list>
+#include <iomanip>
 
 namespace vd {
 
@@ -272,7 +273,7 @@ namespace vd {
             }
 #endif // defined(_WIN32)
 
-
+            throw VeldridException("The provided SwapchainSource::Ref cannot be used to create a Vulkan surface.");
         }
 
     };
@@ -285,13 +286,21 @@ namespace vd {
 
     VkGraphicsDevice::VkGraphicsDevice(GraphicsDeviceOptions options,
                                        std::optional<SwapchainDescription> scDesc,
-                                       VulkanDeviceOptions vkOptions) {
+                                       VulkanDeviceOptions vkOptions) {}
+
+    void VkGraphicsDevice::InitializeComponents(GraphicsDeviceOptions options,
+                                                std::optional<SwapchainDescription> scDesc,
+                                                VulkanDeviceOptions vkOptions) {
+        VkGraphicsDevice::Ref self = vd::AssertSubType<VkGraphicsDevice>(Mochi::GetRef<GraphicsDevice>(this));
         CreateInstance(options.Debug, vkOptions);
         
         vk::SurfaceKHR surface;
+        
         if (scDesc.has_value()) {
-            surface = 
+            surface = VkSurfaceUtil::CreateSurface(self, _instance, scDesc.value().Source);
         }
+        
+        
     }
 
     void VkGraphicsDevice::CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options) {
@@ -431,6 +440,31 @@ namespace vd {
                 }
             }
         }
+    }
+
+    void VkGraphicsDevice::CreatePhysicalDevice() {
+        auto physicalDevices = _instance.enumeratePhysicalDevices();
+        
+        // Just use the first one.
+        _physicalDevice = physicalDevices[0];
+        
+        _physicalDeviceProperties = _physicalDevice.getProperties();
+        _deviceName = _physicalDeviceProperties.deviceName.data();
+        
+        std::stringstream vendorName;
+        vendorName << "id:";
+        vendorName << std::hex << std::setw(8) << std::setfill('0') << _physicalDeviceProperties.vendorID;
+        _vendorName = vendorName.str();
+        
+        // _apiVersion =
+        
+        std::stringstream driverInfo;
+        driverInfo << "version:";
+        driverInfo << std::hex << std::setw(8) << std::setfill('0') << _physicalDeviceProperties.driverVersion;
+        _driverInfo = driverInfo.str();
+        
+        _physicalDeviceFeatures = _physicalDevice.getFeatures();
+        _physicalDeviceMemoryProperties = _physicalDevice.getMemoryProperties();
     }
 
     Mochi::Bool VkGraphicsDevice::HasSurfaceExtension(std::string extension) {

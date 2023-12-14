@@ -60,17 +60,17 @@ MTLFeatureSupport::MTLFeatureSupport(id<MTLDevice> device) {
         }
     }
     
-    _isMacOS = IsSupported(MTLGPUFamilyMac1) ||
-    IsSupported(MTLGPUFamilyMac2) ||
-    IsSupported(MTLGPUFamilyMacCatalyst1) ||
-    IsSupported(MTLGPUFamilyMacCatalyst2);
+    _isMacOS = (IsSupported(MTLGPUFamilyMac1) ||
+                IsSupported(MTLGPUFamilyMac2) ||
+                IsSupported(MTLGPUFamilyMacCatalyst1) ||
+                IsSupported(MTLGPUFamilyMacCatalyst2));
 }
 
 Mochi::Bool MTLFeatureSupport::IsDrawBaseVertexInstanceSupported() {
-    return IsSupported(MTLGPUFamilyApple2) ||
-    IsSupported(MTLGPUFamilyApple3) ||
-    IsSupported(MTLGPUFamilyApple4) ||
-    _isMacOS;
+    return (IsSupported(MTLGPUFamilyApple2) ||
+            IsSupported(MTLGPUFamilyApple3) ||
+            IsSupported(MTLGPUFamilyApple4) ||
+            _isMacOS);
 }
 
 // MARK: -
@@ -91,11 +91,11 @@ MTLGraphicsDevice::MTLGraphicsDevice(GraphicsDeviceOptions options,
                                      std::optional<SwapchainDescription> swapchainDesc) {
     _device = MTLCreateSystemDefaultDevice();
     _deviceName = [_device name];
-    _metalFeatures = std::make_shared<MTLFeatureSupport>(_device);
+    _metalFeatures = Mochi::CreateRef<MTLFeatureSupport>(_device);
     
     int major = (int) _metalFeatures->GetMaxGPUFamily() / 10000;
     int minor = (int) _metalFeatures->GetMaxGPUFamily() % 10000;
-    _apiVersion = std::make_shared<GraphicsApiVersion>(major, minor, 0, 0);
+    _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(major, minor, 0, 0);
     
     _features = (GraphicsDeviceFeatures() |
                  GraphicsDeviceFeaturesBits::ComputeShader |
@@ -128,8 +128,8 @@ MTLGraphicsDevice::MTLGraphicsDevice(GraphicsDeviceOptions options,
 }
 
 void MTLGraphicsDevice::InitializeComponents() {
-    auto device = vd::AssertSubType<MTLGraphicsDevice>(shared_from_this());
-    _resourceFactory = std::make_shared<MTLResourceFactory>(device);
+    auto device = vd::AssertSubType<MTLGraphicsDevice>(Mochi::GetRef<GraphicsDevice>(this));
+    _resourceFactory = Mochi::CreateRef<MTLResourceFactory>(device);
 }
 
 std::string MTLGraphicsDevice::GetDeviceName() { return [_deviceName cStringUsingEncoding:NSUTF8StringEncoding]; }

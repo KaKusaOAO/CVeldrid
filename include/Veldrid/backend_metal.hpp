@@ -74,7 +74,7 @@ public:
     MTLGraphicsDevice(GraphicsDeviceOptions options,
                       std::optional<SwapchainDescription> swapchainDesc);
     
-    void InitializeComponents() override;
+    void InitializeComponents();
     std::string GetDeviceName() override;
     std::string GetVendorName() override;
     GraphicsApiVersion::Ref GetApiVersion() override;

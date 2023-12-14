@@ -247,7 +247,7 @@ namespace vd {
                              Mochi::UInt32 width,
                              Mochi::UInt32 height);
 
-        void InitializeComponents() override;
+        void InitializeComponents();
         std::string GetDeviceName() override;
         std::string GetVendorName() override;
         GraphicsBackend GetBackendType() override;
