@@ -40,59 +40,59 @@
 
 namespace vd {
 
-	class VkGraphicsDevice : public GraphicsDevice {
-	public:
-		using Ref = vd::Ref<VkGraphicsDevice>;
+    class VkGraphicsDevice : public GraphicsDevice {
+    public:
+        using Ref = vd::Ref<VkGraphicsDevice>;
 
-		VkGraphicsDevice(GraphicsDeviceOptions options,
-						 std::optional<SwapchainDescription> scDesc);
-		VkGraphicsDevice(GraphicsDeviceOptions options,
-			             std::optional<SwapchainDescription> scDesc,
-			             VulkanDeviceOptions vkOptions);
+        VkGraphicsDevice(GraphicsDeviceOptions options,
+                         std::optional<SwapchainDescription> scDesc);
+        VkGraphicsDevice(GraphicsDeviceOptions options,
+                         std::optional<SwapchainDescription> scDesc,
+                         VulkanDeviceOptions vkOptions);
 
-		Mochi::Bool HasSurfaceExtension(std::string extension);
-		void EnableDebugCallback(vk::DebugReportFlagsEXT flags = vk::DebugReportFlagBitsEXT::eWarning | vk::DebugReportFlagBitsEXT::eError);
+        Mochi::Bool HasSurfaceExtension(std::string extension);
+        void EnableDebugCallback(vk::DebugReportFlagsEXT flags = vk::DebugReportFlagBitsEXT::eWarning | vk::DebugReportFlagBitsEXT::eError);
 
-	private:
-		static const char* s_name;
+    private:
+        static const char* s_name;
 
-		vk::Instance _instance;
-		vk::PhysicalDevice _physicalDevice;
-		std::string _deviceName;
-		std::string _vendorName;
-		GraphicsApiVersion::Ref _apiVersion;
-		std::string _driverName;
+        vk::Instance _instance;
+        vk::PhysicalDevice _physicalDevice;
+        std::string _deviceName;
+        std::string _vendorName;
+        GraphicsApiVersion::Ref _apiVersion;
+        std::string _driverName;
 
-		std::vector<std::string> _surfaceExtensions;
+        std::vector<std::string> _surfaceExtensions;
 
-		Mochi::Bool _standardValidationSupported;
-		Mochi::Bool _khronosValidationSupported;
-		vk::DebugReportCallbackEXT _debugCallbackHandle;
+        Mochi::Bool _standardValidationSupported;
+        Mochi::Bool _khronosValidationSupported;
+        vk::DebugReportCallbackEXT _debugCallbackHandle;
 
-		Mochi::Bool _supportsGetBufferMemoryRequirements2;
-		Mochi::Bool _supportsGetImageMemoryRequirements2;
-		Mochi::Bool _supportsGetPhysicalDeviceProperties2;
-		Mochi::Bool _supportsCreateMetalSurfaceEXT;
+        Mochi::Bool _supportsGetBufferMemoryRequirements2;
+        Mochi::Bool _supportsGetImageMemoryRequirements2;
+        Mochi::Bool _supportsGetPhysicalDeviceProperties2;
+        Mochi::Bool _supportsCreateMetalSurfaceEXT;
 
-		Mochi::Bool _useKHR_getPhysicalDeviceProperties2;
+        Mochi::Bool _useKHR_getPhysicalDeviceProperties2;
 
-		void CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options);
+        void CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options);
 
-		template <class T = void*>
-		T GetInstanceProcAddr(std::string name) {
-			return (T)_instance.getProcAddr(name);
-		}
+        template <class T = void*>
+        T GetInstanceProcAddr(std::string name) {
+            return (T)_instance.getProcAddr(name);
+        }
 
-		static VkBool32 DebugCallback(
-			VkDebugReportFlagsEXT                       flags,
-			VkDebugReportObjectTypeEXT                  objectType,
-			uint64_t                                    object,
-			size_t                                      location,
-			int32_t                                     messageCode,
-			const char* pLayerPrefix,
-			const char* pMessage,
-			void* pUserData);
-	};
+        static VkBool32 DebugCallback(
+            VkDebugReportFlagsEXT                       flags,
+            VkDebugReportObjectTypeEXT                  objectType,
+            uint64_t                                    object,
+            size_t                                      location,
+            int32_t                                     messageCode,
+            const char* pLayerPrefix,
+            const char* pMessage,
+            void* pUserData);
+    };
 
 };
 

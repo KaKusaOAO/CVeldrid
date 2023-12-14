@@ -83,7 +83,6 @@ public:
     
     friend std::ostream& operator<<(std::ostream& os, const GraphicsApiVersion& version);
     static Mochi::Bool TryParseGLVersion(std::string versionString, GraphicsApiVersion* outVersion);
-    static Ref CreateRef(int major, int minor, int subminor, int patch);
 
 private:
     int _major;

@@ -569,25 +569,25 @@ namespace vd {
 
         switch (_device->GetFeatureLevel()) {
         case D3D_FEATURE_LEVEL_10_0:
-            _apiVersion = GraphicsApiVersion::CreateRef(10, 0, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(10, 0, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_10_1:
-            _apiVersion = GraphicsApiVersion::CreateRef(10, 1, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(10, 1, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_11_0:
-            _apiVersion = GraphicsApiVersion::CreateRef(11, 0, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(11, 0, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_11_1:
-            _apiVersion = GraphicsApiVersion::CreateRef(11, 1, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(11, 1, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_12_0:
-            _apiVersion = GraphicsApiVersion::CreateRef(12, 0, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(12, 0, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_12_1:
-            _apiVersion = GraphicsApiVersion::CreateRef(12, 1, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(12, 1, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_12_2:
-            _apiVersion = GraphicsApiVersion::CreateRef(12, 2, 0, 0);
+            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(12, 2, 0, 0);
             break;
         }
 

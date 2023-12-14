@@ -43,10 +43,6 @@ Mochi::Bool GraphicsApiVersion::TryParseGLVersion(std::string versionString, Gra
     return false;
 }
 
-GraphicsApiVersion::Ref GraphicsApiVersion::CreateRef(int major, int minor, int subminor, int patch) {
-    return std::make_shared<GraphicsApiVersion>(major, minor, subminor, patch);
-}
-
 // MARK: -
 
 Mochi::UInt32 GetSizeInBytes(PixelFormat format) {
