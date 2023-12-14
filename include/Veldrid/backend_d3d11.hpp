@@ -23,6 +23,25 @@ namespace vd {
     };
 
     class D3D11Texture : public Texture {
+    public:
+        using Ref = vd::Ref<D3D11Texture>;
+
+        D3D11Texture(ID3D11Device* device, TextureDescription& description);
+        D3D11Texture(ID3D11Texture2D* existingTexture, TextureType type, PixelFormat format);
+
+        PixelFormat        GetFormat()      override;
+        Mochi::UInt32      GetWidth()       override;
+        Mochi::UInt32      GetHeight()      override;
+        Mochi::UInt32      GetDepth()       override;
+        Mochi::UInt32      GetMipLevels()   override;
+        Mochi::UInt32      GetArrayLayers() override;
+        TextureUsage       GetUsage()       override;
+        TextureType        GetType()        override;
+        TextureSampleCount GetSampleCount() override;
+
+        Mochi::Bool IsDisposed() override;
+        void DisposeCore() override;
+
     private:
         ID3D11Device* _device;
         std::string _name;
@@ -40,67 +59,63 @@ namespace vd {
         ID3D11Resource* _deviceTexture;
         DXGI_FORMAT _dxgiFormat;
         DXGI_FORMAT _typelessDxgiFormat;
-
-    public:
-        using Ref = std::shared_ptr<D3D11Texture>;
-
-        D3D11Texture(ID3D11Device* device, TextureDescription& description);
-        D3D11Texture(ID3D11Texture2D* existingTexture, TextureType type, PixelFormat format);
-
-        PixelFormat        GetFormat()      override;
-        Mochi::UInt32      GetWidth()       override;
-        Mochi::UInt32      GetHeight()      override;
-        Mochi::UInt32      GetDepth()       override;
-        Mochi::UInt32      GetMipLevels()   override;
-        Mochi::UInt32      GetArrayLayers() override;
-        TextureUsage       GetUsage()       override;
-        TextureType        GetType()        override;
-        TextureSampleCount GetSampleCount() override;
-
-        Mochi::Bool IsDisposed() override;
-        void DisposeCore() override;
     };
 
     class D3D11Framebuffer : public Framebuffer {
+    public:
+        using Ref = vd::Ref<D3D11Framebuffer>;
+
+        D3D11Framebuffer(ID3D11Device* device, FramebufferDescription& description);
+        std::string GetName() override;
+        void SetName(std::string name) override;
+        Mochi::Bool IsDisposed() override;
+        void Dispose() override;
+
     private:
         std::string _name;
         Mochi::Bool _disposed;
 
         std::vector<ID3D11RenderTargetView*> _renderTargetViews;
         ID3D11DepthStencilView* _depthStencilView;
-
-    public:
-        D3D11Framebuffer(ID3D11Device* device, FramebufferDescription& description);
-        std::string GetName() override;
-        void SetName(std::string name) override;
-        Mochi::Bool IsDisposed() override;
-        void Dispose() override;
     };
 
     class D3D11GraphicsDevice : public GraphicsDevice {
+    public:
+        using Ref = vd::Ref<D3D11GraphicsDevice>;
+        D3D11GraphicsDevice(D3D11DeviceOptions options, std::optional<SwapchainDescription> swapchainDesc);
+        void InitializeComponents() override;
+
     private:
         IDXGIAdapter* _dxgiAdapter;
         ID3D11Device* _device;
         std::string _deviceName;
         std::string _vendorName;
-        GraphicsApiVersionRef _apiVersion;
+        GraphicsApiVersion::Ref _apiVersion;
         int _deviceId;
         ID3D11DeviceContext* _immediateContext;
         Mochi::Bool _supportsConcurrentResources;
         Mochi::Bool _supportsCommandLists;
-
-    public:
-        using Ref = __MC_REF_TYPE(D3D11GraphicsDevice);
-        D3D11GraphicsDevice(D3D11DeviceOptions options, std::optional<SwapchainDescription> swapchainDesc);
-        void InitializeComponents() override;
     };
 
     class D3D11ResourceLayout : public ResourceLayout {
     public:
-        using Ref = __MC_REF_TYPE(D3D11ResourceLayout);
+        using Ref = vd::Ref<D3D11ResourceLayout>;
     };
 
     class D3D11ResourceCache : public Mochi::IDisposable {
+    public:
+        using Ref = vd::Ref<D3D11ResourceCache>;
+
+        D3D11ResourceCache(ID3D11Device* device);
+
+        void GetPipelineResources(BlendStateDescription& blendDesc,
+                                  Mochi::Bool multiSample,
+                                  const void* vsBytecode,
+                                  size_t vsBytecodeLength,
+                                  ID3D11BlendState** outBlendState,
+                                  ID3D11DepthStencilState** outDepthState,
+                                  ID3D11RasterizerState** outRasterState,
+                                  ID3D11InputLayout** outInputLayout);
     private:
         ID3D11Device* _device;
         std::mutex _lock;
@@ -112,22 +127,29 @@ namespace vd {
                                                 const void* vsBytecode,
                                                 size_t vsByteCodeLength);
         std::string GetSemanticString(VertexElementSemantic semantic);
-
-    public:
-        using Ref = __MC_REF_TYPE(D3D11ResourceCache);
-        D3D11ResourceCache(ID3D11Device* device);
-
-        void GetPipelineResources(BlendStateDescription& blendDesc,
-                                  Mochi::Bool multiSample,
-                                  const void* vsBytecode,
-                                  size_t vsBytecodeLength,
-                                  ID3D11BlendState**        outBlendState,
-                                  ID3D11DepthStencilState** outDepthState,
-                                  ID3D11RasterizerState**   outRasterState,
-                                  ID3D11InputLayout**       outInputLayout);
     };
 
     class D3D11Pipeline : public Pipeline {
+    public:
+        using Ref = vd::Ref<D3D11Pipeline>;
+
+        ID3D11BlendState*        GetBlendState();
+        ID3D11DepthStencilState* GetDepthStencilState();
+        ID3D11RasterizerState*   GetRasterizerState();
+        D3D_PRIMITIVE_TOPOLOGY   GetPrimitiveTopology();
+        ID3D11InputLayout*       GetInputLayout();
+        ID3D11VertexShader*      GetVertexShader();
+        ID3D11GeometryShader*    GetGeometryShader(); // May be null.
+        ID3D11HullShader*        GetHullShader();     // May be null.
+        ID3D11DomainShader*      GetDomainShader();   // May be null.
+        ID3D11PixelShader*       GetPixelShader();
+        ID3D11ComputeShader*     GetComputeShader();
+
+        std::vector<D3D11ResourceLayout::Ref> GetResourceLayouts();
+        std::vector<int> GetVertexStrides();
+
+        Mochi::Bool IsComputePipeline() override;
+
     private:
         std::string _name;
         Mochi::Bool _disposed;
@@ -146,29 +168,12 @@ namespace vd {
         
         std::vector<D3D11ResourceLayout::Ref> _resourceLayouts;
         std::vector<int> _vertexStrides;
-
-    public:
-        using Ref = __MC_REF_TYPE(D3D11Pipeline);
-
-        ID3D11BlendState*        GetBlendState();
-        ID3D11DepthStencilState* GetDepthStencilState();
-        ID3D11RasterizerState*   GetRasterizerState();
-        D3D_PRIMITIVE_TOPOLOGY   GetPrimitiveTopology();
-        ID3D11InputLayout*       GetInputLayout();
-        ID3D11VertexShader*      GetVertexShader();
-        ID3D11GeometryShader*    GetGeometryShader(); // May be null.
-        ID3D11HullShader*        GetHullShader();     // May be null.
-        ID3D11DomainShader*      GetDomainShader();   // May be null.
-        ID3D11PixelShader*       GetPixelShader();
-        ID3D11ComputeShader*     GetComputeShader();
-
-        std::vector<D3D11ResourceLayout::Ref> GetResourceLayouts();
-        std::vector<int> GetVertexStrides();
-
-        Mochi::Bool IsComputePipeline() override;
     };
 
     class D3D11CommandList : public CommandList {
+    public:
+        using Ref = vd::Ref<D3D11CommandList>;
+
     private:
         D3D11GraphicsDevice::Ref _gd;
         ID3D11DeviceContext* _context;

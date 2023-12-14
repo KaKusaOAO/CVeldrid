@@ -173,6 +173,9 @@ namespace vd {
     };
 
     class OpenGLPlatformInfo {
+    public:
+        using Ref = vd::Ref<OpenGLPlatformInfo>;
+
         using GetProcAddressFunc = std::function<void* (std::string)>;
         using MakeCurrentFunc = std::function<void(void*)>;
         using GetCurrentContextFunc = std::function<void* ()>;
@@ -182,6 +185,17 @@ namespace vd {
         using SetSyncToVBlankFunc = std::function<void(Mochi::Bool)>;
         using SetSwapchainFBFunc = std::function<void()>;
         using ResizeSwapchainFunc = std::function<void(Mochi::UInt32, Mochi::UInt32)>;
+
+        void* GetOpenGLContextHandle();
+        void* GetProcAddress(std::string funcName);
+        void MakeCurrent(void* context);
+        void* GetCurrentContext();
+        void ClearCurrentContext();
+        void DeleteContext(void* context);
+        void SwapBuffers();
+        void SetSyncToVerticalBlank(Mochi::Bool sync);
+        void SetSwapchainFramebuffer();
+        void ResizeSwapchain(Mochi::UInt32 width, Mochi::UInt32 height);
 
     private:
         void* _contextHandle;
@@ -194,21 +208,7 @@ namespace vd {
         SetSyncToVBlankFunc     _SetSyncToVerticalBlank;
         SetSwapchainFBFunc      _SetSwapchainFramebuffer;
         ResizeSwapchainFunc     _ResizeSwapchain;
-
-    public:
-        void* GetOpenGLContextHandle();
-        void* GetProcAddress(std::string funcName);
-        void MakeCurrent(void* context);
-        void* GetCurrentContext();
-        void ClearCurrentContext();
-        void DeleteContext(void* context);
-        void SwapBuffers();
-        void SetSyncToVerticalBlank(Mochi::Bool sync);
-        void SetSwapchainFramebuffer();
-        void ResizeSwapchain(Mochi::UInt32 width, Mochi::UInt32 height);
     };
-
-    __MC_DEFINE_REF_TYPE(OpenGLPlatformInfo)
 
     class OpenGLPipeline : public Pipeline, public IOpenGLDeferredResource {
     private:
@@ -226,16 +226,14 @@ namespace vd {
         void DestroyGLResources() override;
     };
 
-    __MC_DEFINE_REF_TYPE(OpenGLPipeline)
-
     class OpenGLGraphicsDevice : public GraphicsDevice {
     private:
-        ResourceFactoryRef _resourceFactory;
+        ResourceFactory::Ref _resourceFactory;
         std::string _deviceName;
         std::string _vendorName;
         std::string _version;
         std::string _shadingLanguageVersion;
-        GraphicsApiVersionRef _apiVersion;
+        GraphicsApiVersion::Ref _apiVersion;
         GraphicsBackend _backendType;
         GraphicsDeviceFeatures _features;
         GLuint _vao;
@@ -243,7 +241,7 @@ namespace vd {
 
     public:
         OpenGLGraphicsDevice(GraphicsDeviceOptions options,
-                             OpenGLPlatformInfoRef info,
+                             OpenGLPlatformInfo::Ref info,
                              Mochi::UInt32 width,
                              Mochi::UInt32 height);
 
@@ -251,14 +249,14 @@ namespace vd {
         std::string GetDeviceName() override;
         std::string GetVendorName() override;
         GraphicsBackend GetBackendType() override;
-        GraphicsApiVersionRef GetApiVersion() override;
+        GraphicsApiVersion::Ref GetApiVersion() override;
         Mochi::Bool IsUvOriginTopLeft() override;
         Mochi::Bool IsDepthRangeZeroToOne() override;
         Mochi::Bool IsClipSpaceYInverted() override;
-        ResourceFactoryRef GetResourceFactory() override;
+        ResourceFactory::Ref GetResourceFactory() override;
         GraphicsDeviceFeatures GetFeatures() override;
             
-        void SubmitCommandsCore(CommandListRef commandList, FenceRef fence) override;
+        void SubmitCommandsCore(CommandList::Ref commandList, Fence::Ref fence) override;
     };
 
 }

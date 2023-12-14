@@ -43,7 +43,7 @@ Mochi::Bool GraphicsApiVersion::TryParseGLVersion(std::string versionString, Gra
     return false;
 }
 
-GraphicsApiVersionRef GraphicsApiVersion::CreateRef(int major, int minor, int subminor, int patch) {
+GraphicsApiVersion::Ref GraphicsApiVersion::CreateRef(int major, int minor, int subminor, int patch) {
     return std::make_shared<GraphicsApiVersion>(major, minor, subminor, patch);
 }
 
@@ -130,7 +130,7 @@ Mochi::Bool BufferDescription::operator==(const BufferDescription& other) {
 
 // MARK: -
 
-OutputDescription OutputDescription::CreateFromFramebuffer(FramebufferRef fb) {
+OutputDescription OutputDescription::CreateFromFramebuffer(Framebuffer::Ref fb) {
     TextureSampleCount sampleCount = static_cast<TextureSampleCount>(0);
     std::optional<OutputAttachmentDescription> depthAttachment;
     
@@ -273,7 +273,7 @@ Mochi::UInt32 Texture::CalculateSubresource(Mochi::UInt32 mipLevel, Mochi::UInt3
     return arrayLayer * GetMipLevels() + mipLevel;
 }
 
-TextureViewRef Texture::GetFullTextureView(GraphicsDeviceRef gd) {
+TextureView::Ref Texture::GetFullTextureView(GraphicsDevice::Ref gd) {
     std::lock_guard<std::mutex> lock(_fullTextureViewLock);
     if (_fullTextureView == nullptr) {
         _fullTextureView = CreateFullTextureView(gd);
@@ -282,7 +282,7 @@ TextureViewRef Texture::GetFullTextureView(GraphicsDeviceRef gd) {
     return _fullTextureView;
 }
 
-TextureViewRef Texture::CreateFullTextureView(GraphicsDeviceRef gd) {
+TextureView::Ref Texture::CreateFullTextureView(GraphicsDevice::Ref gd) {
     return gd->GetResourceFactory()->CreateTextureView(shared_from_this());
 }
 
@@ -297,13 +297,13 @@ void Texture::Dispose() {
 
 // MARK:
 
-FramebufferAttachment::FramebufferAttachment(TextureRef target, Mochi::UInt32 arrayLayer) {
+FramebufferAttachment::FramebufferAttachment(Texture::Ref target, Mochi::UInt32 arrayLayer) {
     Target = target;
     ArrayLayer = arrayLayer;
     MipLevel = 0;
 }
 
-FramebufferAttachment::FramebufferAttachment(TextureRef target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel) {
+FramebufferAttachment::FramebufferAttachment(Texture::Ref target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel) {
     Target = target;
     ArrayLayer = arrayLayer;
     MipLevel = mipLevel;
@@ -311,13 +311,13 @@ FramebufferAttachment::FramebufferAttachment(TextureRef target, Mochi::UInt32 ar
 
 // MARK:
 
-FramebufferAttachmentDescription::FramebufferAttachmentDescription(TextureRef target, Mochi::UInt32 arrayLayer) {
+FramebufferAttachmentDescription::FramebufferAttachmentDescription(Texture::Ref target, Mochi::UInt32 arrayLayer) {
     Target = target;
     ArrayLayer = arrayLayer;
     MipLevel = 0;
 }
 
-FramebufferAttachmentDescription::FramebufferAttachmentDescription(TextureRef target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel) {
+FramebufferAttachmentDescription::FramebufferAttachmentDescription(Texture::Ref target, Mochi::UInt32 arrayLayer, Mochi::UInt32 mipLevel) {
     Target = target;
     ArrayLayer = arrayLayer;
     MipLevel = mipLevel;
@@ -353,7 +353,7 @@ OutputDescription Framebuffer::GetOutputDescription() { return _outputDescriptio
 
 // MARK: -
 
-TextureViewDescription::TextureViewDescription(TextureRef target) {
+TextureViewDescription::TextureViewDescription(Texture::Ref target) {
     Target = target;
     BaseMipLevel = 0;
     MipLevels = target->GetMipLevels();
@@ -367,12 +367,12 @@ TextureViewDescription::TextureViewDescription(TextureRef target) {
 ResourceFactory::ResourceFactory(GraphicsDeviceFeatures features)
 : _features(features) {}
 
-TextureViewRef ResourceFactory::CreateTextureView(TextureRef target) {
+TextureView::Ref ResourceFactory::CreateTextureView(Texture::Ref target) {
     TextureViewDescription desc(target);
     return CreateTextureView(desc);
 }
 
-TextureViewRef ResourceFactory::CreateTextureView(TextureViewDescription &description) {
+TextureView::Ref ResourceFactory::CreateTextureView(TextureViewDescription &description) {
 #if defined(VD_VALIDATE_USAGE)
     if (description.MipLevels == 0 ||
         description.ArrayLayers == 0 ||
@@ -392,7 +392,7 @@ TextureViewRef ResourceFactory::CreateTextureView(TextureViewDescription &descri
     return CreateTextureViewCore(description);
 }
 
-PipelineRef ResourceFactory::CreateGraphicsPipeline(GraphicsPipelineDescription &description) {
+Pipeline::Ref ResourceFactory::CreateGraphicsPipeline(GraphicsPipelineDescription &description) {
 #if defined(VD_VALIDATE_USAGE)
     if (!_features.HasFlag(GraphicsDeviceFeaturesBits::IndependentBlend)) {
         if (description.BlendState.AttachmentStates.size() > 0) {
@@ -415,62 +415,62 @@ void GraphicsDevice::PostDeviceCreated() {
     
 }
 
-[[noreturn]] inline void ThrowPlatformExcludedException(const std::string name) {
+[[noreturn]] inline void ThrowPlatformExcludedException(const std::string& name) {
     throw VeldridException(name + " support has not been included in this configuration of Veldrid.");
 }
 
 #if !defined(VD_EXCLUDE_D3D11_BACKEND)
 #else
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateD3D11(GraphicsDeviceOptions options, ...) {
+GraphicsDevice::Ref GraphicsDevice::CreateD3D11(GraphicsDeviceOptions options, ...) {
     ThrowPlatformExcludedException("DirectX 11");
 }
 #endif // !defined(VD_EXCLUDE_D3D11_BACKEND)
 
 #if !defined(VD_EXCLUDE_OPENGL_BACKEND)
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateOpenGL(GraphicsDeviceOptions options,
-                                                             OpenGLPlatformInfoRef info,
-                                                             Mochi::UInt32 width,
-                                                             Mochi::UInt32 height) {
-    auto device = std::make_shared<OpenGLGraphicsDevice>(options, info, width, height);
+GraphicsDevice::Ref GraphicsDevice::CreateOpenGL(GraphicsDeviceOptions options,
+                                                 OpenGLPlatformInfo::Ref info,
+                                                 Mochi::UInt32 width,
+                                                 Mochi::UInt32 height) {
+    auto device = Mochi::CreateRef<OpenGLGraphicsDevice>(options, info, width, height);
     device->InitializeComponents();
     return device;
 }
 
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateOpenGLES(GraphicsDeviceOptions options,
-                                                               SwapchainDescription description) {
+GraphicsDevice::Ref GraphicsDevice::CreateOpenGLES(GraphicsDeviceOptions options,
+                                                   SwapchainDescription description) {
     Mochi::ThrowNotImplemented();
 }
 #else
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateOpenGL(GraphicsDeviceOptions options, ...) {
+GraphicsDevice::Ref GraphicsDevice::CreateOpenGL(GraphicsDeviceOptions options, ...) {
     ThrowPlatformExcludedException("OpenGL");
 }
 
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateOpenGLES(GraphicsDeviceOptions options, ...) {
+GraphicsDevice::Ref GraphicsDevice::CreateOpenGLES(GraphicsDeviceOptions options, ...) {
     ThrowPlatformExcludedException("OpenGL");
 }
 #endif // !defined(VD_EXCLUDE_OPENGL_BACKEND)
 
 #if !defined(VD_EXCLUDE_METAL_BACKEND)
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateMetal(GraphicsDeviceOptions options) {
-    auto device = std::make_shared<MTLGraphicsDevice>(options, std::optional<SwapchainDescription>());
+GraphicsDevice::Ref GraphicsDevice::CreateMetal(GraphicsDeviceOptions options) {
+    auto device = Mochi::CreateRef<MTLGraphicsDevice>(options, std::optional<SwapchainDescription>());
     device->InitializeComponents();
     return device;
 }
 
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateMetal(GraphicsDeviceOptions options,
-                                                            SwapchainDescription description) {
-    auto device = std::make_shared<MTLGraphicsDevice>(options, std::optional<SwapchainDescription>({description}));
+GraphicsDevice::Ref GraphicsDevice::CreateMetal(GraphicsDeviceOptions options,
+                                                SwapchainDescription description) {
+    auto device = Mochi::CreateRef<MTLGraphicsDevice>(options, std::optional<SwapchainDescription>({description}));
     device->InitializeComponents();
     return device;
 }
 
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateMetal(GraphicsDeviceOptions options,
-                                                            MetalContainerRef container) {
+GraphicsDevice::Ref GraphicsDevice::CreateMetal(GraphicsDeviceOptions options,
+                                                MetalContainerRef container) {
     SwapchainDescription desc = {
 #if defined(__VD_TARGET_MACOS)
-        std::make_shared<NSWindowSwapchainSource>(container),
+        Mochi::CreateRef<NSWindowSwapchainSource>(container),
 #else
-        std::make_shared<UIViewSwapchainSource>(container),
+        Mochi::CreateRef<UIViewSwapchainSource>(container),
 #endif // defined(__VD_TARGET_MACOS)
         0, 0,
         options.SwapchainDepthFormat,
@@ -478,12 +478,12 @@ std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateMetal(GraphicsDeviceOption
         options.SwapchainSrgbFormat
     };
     
-    auto device = std::make_shared<MTLGraphicsDevice>(options, std::optional<SwapchainDescription>({desc}));
+    auto device = Mochi::CreateRef<MTLGraphicsDevice>(options, std::optional<SwapchainDescription>({desc}));
     device->InitializeComponents();
     return device;
 }
 #else
-std::shared_ptr<GraphicsDevice> GraphicsDevice::CreateMetal(GraphicsDeviceOptions options, ...) {
+GraphicsDevice::Ref GraphicsDevice::CreateMetal(GraphicsDeviceOptions options, ...) {
     ThrowPlatformExcludedException("Metal");
 }
 #endif // !defined(VD_EXCLUDE_METAL_BACKEND)

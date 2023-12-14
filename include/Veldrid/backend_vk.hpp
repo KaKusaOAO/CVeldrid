@@ -28,12 +28,12 @@
 #	include <vulkan/vulkan_macos.h>
 #	include <vulkan/vulkan_ios.h>
 // #elif defined(__linux__)
-#	include <vulkan/vulkan_xcb.h>
+// #	include <vulkan/vulkan_xcb.h>
 // #elif defined(__ANDROID__)
 #	include <vulkan/vulkan_android.h>
 // #endif
-#include <vulkan/vulkan_xlib.h>
-#include <vulkan/vulkan_wayland.h>
+// #include <vulkan/vulkan_xlib.h>
+// #include <vulkan/vulkan_wayland.h>
 
 #include <vector>
 #include <list>
@@ -42,7 +42,7 @@ namespace vd {
 
 	class VkGraphicsDevice : public GraphicsDevice {
 	public:
-		using Ref = __MC_REF_TYPE(VkGraphicsDevice);
+		using Ref = vd::Ref<VkGraphicsDevice>;
 
 		VkGraphicsDevice(GraphicsDeviceOptions options,
 						 std::optional<SwapchainDescription> scDesc);

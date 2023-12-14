@@ -333,13 +333,17 @@ namespace vd {
 			_surfaceExtensions.push_back(VK_KHR_ANDROID_SURFACE_EXTENSION_NAME);
 		}
 
+#if defined(VULKAN_XLIB_H_)
 		if (availableInstanceExtensions.contains(VK_KHR_XLIB_SURFACE_EXTENSION_NAME)) {
 			_surfaceExtensions.push_back(VK_KHR_XLIB_SURFACE_EXTENSION_NAME);
 		}
+#endif // defined(VULKAN_XLIB_H_)
 
+#if defined(VULKAN_WAYLAND_H_)
 		if (availableInstanceExtensions.contains(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME)) {
 			_surfaceExtensions.push_back(VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME);
 		}
+#endif // defined(VULKAN_WAYLAND_H_)
 
 		#endif // defined(VK_USE_PLATFORM_ANDROID_KHR)
 

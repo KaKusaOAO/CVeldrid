@@ -256,7 +256,7 @@ namespace vd {
     // MARK: -
 
     OpenGLGraphicsDevice::OpenGLGraphicsDevice(GraphicsDeviceOptions options,
-        OpenGLPlatformInfoRef info,
+        OpenGLPlatformInfo::Ref info,
         Mochi::UInt32 width,
         Mochi::UInt32 height) {
         Mochi::ThrowNotImplemented();
@@ -274,7 +274,7 @@ namespace vd {
         Mochi::ThrowNotImplemented();
     }
 
-    GraphicsApiVersionRef OpenGLGraphicsDevice::GetApiVersion() {
+    GraphicsApiVersion::Ref OpenGLGraphicsDevice::GetApiVersion() {
         Mochi::ThrowNotImplemented();
     }
 
@@ -294,7 +294,7 @@ namespace vd {
         Mochi::ThrowNotImplemented();
     }
 
-    ResourceFactoryRef OpenGLGraphicsDevice::GetResourceFactory() {
+    ResourceFactory::Ref OpenGLGraphicsDevice::GetResourceFactory() {
         Mochi::ThrowNotImplemented();
     }
 
@@ -302,7 +302,7 @@ namespace vd {
         Mochi::ThrowNotImplemented();
     }
 
-    void OpenGLGraphicsDevice::SubmitCommandsCore(CommandListRef commandList, FenceRef fence) {
+    void OpenGLGraphicsDevice::SubmitCommandsCore(CommandList::Ref commandList, Fence::Ref fence) {
         Mochi::ThrowNotImplemented();
     }
 }
