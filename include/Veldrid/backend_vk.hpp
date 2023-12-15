@@ -11,28 +11,21 @@
 
 #include <Veldrid/vd.hpp>
 
-#define VK_USE_PLATFORM_ANDROID_KHR
+// -- These macros needs to be defined above vulkan.hpp
 
-#include <vulkan/vulkan.hpp>
+#define VK_USE_PLATFORM_ANDROID_KHR
 
 #if defined (_WIN32)
 #   define VK_USE_PLATFORM_WIN32_KHR
-#	include <vulkan/vulkan_win32.h>
 #elif defined(__APPLE__)
 #   define VK_USE_PLATFORM_METAL_EXT
 #   define VK_USE_PLATFORM_MACOS_MVK
 #   define VK_USE_PLATFORM_IOS_MVK
-#	include <vulkan/vulkan_metal.h>
-#	include <vulkan/vulkan_macos.h>
-#	include <vulkan/vulkan_ios.h>
 // #elif defined(__linux__)
-// #	include <vulkan/vulkan_xcb.h>
 // #elif defined(__ANDROID__)
-// #	include <vulkan/vulkan_android.h>
 #endif
-// #include <vulkan/vulkan_xlib.h>
-// #include <vulkan/vulkan_wayland.h>
 
+#include <vulkan/vulkan.hpp>
 #include <vector>
 #include <list>
 
@@ -70,9 +63,13 @@ namespace vd {
         GraphicsApiVersion::Ref _apiVersion;
         std::string _driverName;
         std::string _driverInfo;
+        VkDeviceMemoryManager::Ref _memoryManager;
         vk::PhysicalDeviceProperties _physicalDeviceProperties;
         vk::PhysicalDeviceFeatures _physicalDeviceFeatures;
         vk::PhysicalDeviceMemoryProperties _physicalDeviceMemoryProperties;
+        vk::Device _device;
+        Mochi::UInt32 _graphicsQueueIndex;
+        Mochi::UInt32 _presentQueueIndex;
 
         std::vector<std::string> _surfaceExtensions;
 
@@ -89,6 +86,8 @@ namespace vd {
 
         void CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options);
         void CreatePhysicalDevice();
+        void CreateLogicalDevice(vk::SurfaceKHR surface, Mochi::Bool preferStandardClipY, VulkanDeviceOptions options);
+        void GetQueueFamilyIndices(vk::SurfaceKHR surface);
 
         template <class T = void*>
         T GetInstanceProcAddr(std::string name) {

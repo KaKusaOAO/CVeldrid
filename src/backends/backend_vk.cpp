@@ -92,11 +92,13 @@ namespace vd {
             barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
             barrier.image = image;
-            barrier.subresourceRange.aspectMask = aspectMask;
-            barrier.subresourceRange.baseMipLevel = baseMipLevel;
-            barrier.subresourceRange.levelCount = levelCount;
-            barrier.subresourceRange.baseArrayLayer = baseArrayLayer;
-            barrier.subresourceRange.layerCount = layerCount;
+
+            vk::ImageSubresourceRange& range = barrier.subresourceRange;
+            range.aspectMask = aspectMask;
+            range.baseMipLevel = baseMipLevel;
+            range.levelCount = levelCount;
+            range.baseArrayLayer = baseArrayLayer;
+            range.layerCount = layerCount;
 
             vk::PipelineStageFlags srcStageFlags;
             vk::PipelineStageFlags dstStageFlags;
@@ -264,12 +266,15 @@ namespace vd {
         static vk::SurfaceKHR CreateSurface(VkGraphicsDevice::Ref gd, vk::Instance instance, SwapchainSource::Ref swapchainSource) {
             auto doCheck = gd != nullptr;
 
-#if defined(_WIN32)
-            if (auto win32Source = std::dynamic_pointer_cast<Win32SwapchainSource>(swapchainSource)) {
-                if (doCheck && !gd->HasSurfaceExtension(VK_KHR_WIN32_SURFACE_EXTENSION_NAME)) {
-                    ThrowExtensionNotAvailable(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+#if defined(_WIN32) 
+            {
+                Win32SwapchainSource::Ref win32Source;
+                if (Mochi::TryCastRef(swapchainSource, win32Source)) {
+                    if (doCheck && !gd->HasSurfaceExtension(VK_KHR_WIN32_SURFACE_EXTENSION_NAME)) {
+                        ThrowExtensionNotAvailable(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+                    }
+                    return CreateWin32(instance, win32Source);
                 }
-                return CreateWin32(instance, win32Source);
             }
 #endif // defined(_WIN32)
 
@@ -465,6 +470,36 @@ namespace vd {
         
         _physicalDeviceFeatures = _physicalDevice.getFeatures();
         _physicalDeviceMemoryProperties = _physicalDevice.getMemoryProperties();
+    }
+
+    void VkGraphicsDevice::CreateLogicalDevice(vk::SurfaceKHR surface, Mochi::Bool preferStandardClipY, VulkanDeviceOptions options) {
+        GetQueueFamilyIndices(surface);
+    }
+
+    void VkGraphicsDevice::GetQueueFamilyIndices(vk::SurfaceKHR surface) {
+        auto qfp = _physicalDevice.getQueueFamilyProperties();
+
+        bool foundGraphics = false;
+        bool foundPresent = !surface;
+
+        int index = 0;
+        for (auto& prop : qfp) {
+            if (prop.queueFlags & vk::QueueFlagBits::eGraphics) {
+                _graphicsQueueIndex = index;
+                foundGraphics = true;
+            }
+
+            if (!foundPresent) {
+                if (_physicalDevice.getSurfaceSupportKHR(index, surface)) {
+                    _presentQueueIndex = index;
+                    foundPresent = true;
+                }
+            }
+
+            if (foundGraphics && foundPresent) return;
+
+            index++;
+        }
     }
 
     Mochi::Bool VkGraphicsDevice::HasSurfaceExtension(std::string extension) {

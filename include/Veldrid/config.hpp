@@ -24,6 +24,8 @@
 #if !defined(__APPLE__)
 #   define VD_EXCLUDE_METAL_BACKEND
 #else
+// Exclude Vulkan from Apple platforms for now
+#   define VD_EXCLUDE_VK_BACKEND
 #   if __has_include(<AppKit/AppKit.h>)
 #       define __VD_TARGET_MACOS
 #   else
