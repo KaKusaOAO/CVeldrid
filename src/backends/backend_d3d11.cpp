@@ -6,7 +6,7 @@
 
 namespace vd {
 
-    DXGI_FORMAT D3D11Formats::ToDxgiFormat(PixelFormat format, Mochi::Bool depthFormat) {
+    DXGI_FORMAT D3D11Formats::ToDxgiFormat(PixelFormat format, Bool depthFormat) {
         switch (format) {
         case PixelFormat::R8_UNorm:
             return DXGI_FORMAT_R8_UNORM;
@@ -424,7 +424,7 @@ namespace vd {
             desc.MiscFlags = optionFlags;
 
             DXGI_SAMPLE_DESC sampleDesc = {};
-            sampleDesc.Count = (Mochi::UInt32) _sampleCount;
+            sampleDesc.Count = (UInt32) _sampleCount;
             sampleDesc.Quality = 0;
             desc.SampleDesc = sampleDesc;
 
@@ -481,16 +481,16 @@ namespace vd {
     }
 
     PixelFormat        D3D11Texture::GetFormat()      { return _format; }
-    Mochi::UInt32      D3D11Texture::GetWidth()       { return _width; }
-    Mochi::UInt32      D3D11Texture::GetHeight()      { return _height; }
-    Mochi::UInt32      D3D11Texture::GetDepth()       { return _depth; }
-    Mochi::UInt32      D3D11Texture::GetMipLevels()   { return _mipLevels; }
-    Mochi::UInt32      D3D11Texture::GetArrayLayers() { return _arrayLayers; }
+    UInt32      D3D11Texture::GetWidth()       { return _width; }
+    UInt32      D3D11Texture::GetHeight()      { return _height; }
+    UInt32      D3D11Texture::GetDepth()       { return _depth; }
+    UInt32      D3D11Texture::GetMipLevels()   { return _mipLevels; }
+    UInt32      D3D11Texture::GetArrayLayers() { return _arrayLayers; }
     TextureUsage       D3D11Texture::GetUsage()       { return _usage; }
     TextureType        D3D11Texture::GetType()        { return _type; }
     TextureSampleCount D3D11Texture::GetSampleCount() { return _sampleCount; }
 
-    Mochi::Bool D3D11Texture::IsDisposed() { return _deviceTexture == 0; }
+    Bool D3D11Texture::IsDisposed() { return _deviceTexture == 0; }
 
     void D3D11Texture::DisposeCore() {
         _deviceTexture->Release();
@@ -502,7 +502,7 @@ namespace vd {
 #pragma region -- D3D11Framebuffer
 
     D3D11Framebuffer::D3D11Framebuffer(ID3D11Device* device, FramebufferDescription& description)
-    : Framebuffer(description.DepthTarget, description.ColorTargets) {
+    : Framebuffer(description.DepthTarget, description.ColorTargets), _depthStencilView(), _disposed(false) {
         if (description.DepthTarget.has_value()) {
             
         }
@@ -510,7 +510,7 @@ namespace vd {
 
 #pragma endregion
 
-    Mochi::Bool SdkLayersAvailable() {
+    Bool SdkLayersAvailable() {
         HRESULT result = D3D11CreateDevice(0, D3D_DRIVER_TYPE_NULL, 0, D3D11_CREATE_DEVICE_DEBUG, 0, 0, D3D11_SDK_VERSION, 0, 0, 0);
         return SUCCEEDED(result);
     }
@@ -569,25 +569,25 @@ namespace vd {
 
         switch (_device->GetFeatureLevel()) {
         case D3D_FEATURE_LEVEL_10_0:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(10, 0, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(10, 0, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_10_1:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(10, 1, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(10, 1, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_11_0:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(11, 0, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(11, 0, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_11_1:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(11, 1, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(11, 1, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_12_0:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(12, 0, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(12, 0, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_12_1:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(12, 1, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(12, 1, 0, 0);
             break;
         case D3D_FEATURE_LEVEL_12_2:
-            _apiVersion = Mochi::CreateRef<GraphicsApiVersion>(12, 2, 0, 0);
+            _apiVersion = CreateRef<GraphicsApiVersion>(12, 2, 0, 0);
             break;
         }
 
@@ -650,49 +650,54 @@ namespace vd {
     ID3D11InputLayout* D3D11ResourceCache::CreateNewInputLayout(std::vector<VertexLayoutDescription> vertexLayouts,
                                                                 const void* vsBytecode,
                                                                 size_t vsByteCodeLength) {
-        int totalCount = 0;
-        for (auto layout : vertexLayouts) {
+        size_t totalCount = 0;
+        for (auto& layout : vertexLayouts) {
             totalCount += layout.Elements.size();
         }
 
         int element = 0;
-        D3D11_INPUT_ELEMENT_DESC* elements = (D3D11_INPUT_ELEMENT_DESC*) malloc(sizeof(D3D11_INPUT_ELEMENT_DESC) * totalCount);
+        D3D11_INPUT_ELEMENT_DESC* elements = new D3D11_INPUT_ELEMENT_DESC[totalCount];
         memset(elements, 0, sizeof(D3D11_INPUT_ELEMENT_DESC) * totalCount);
 
-        SemanticIndices si = {};
-        for (int slot = 0; slot < vertexLayouts.size(); slot++) {
-            auto elementDescs = vertexLayouts[slot].Elements;
-            auto stepRate = vertexLayouts[slot].InstanceStepRate;
-            int currentOffset = 0;
+        if (totalCount > 0) {
+            SemanticIndices si = {};
+            for (int slot = 0; slot < vertexLayouts.size(); slot++) {
+                auto elementDescs = vertexLayouts[slot].Elements;
+                auto stepRate = vertexLayouts[slot].InstanceStepRate;
+                int currentOffset = 0;
 
-            for (int i = 0; i < elementDescs.size(); i++) {
-                auto desc = elementDescs[i];
+                for (int i = 0; i < elementDescs.size(); i++) {
+                    if (element >= totalCount) {
+                        throw VeldridException("element >= totalCount");
+                    }
 
-                D3D11_INPUT_ELEMENT_DESC entry = {
-                    GetSemanticString(desc.Semantic).c_str(),
-                    SemanticIndices::GetAndIncrement(si, desc.Semantic),
-                    D3D11Formats::ToDxgiFormat(desc.Format),
-                    desc.Offset != 0 ? desc.Offset : currentOffset,
-                    slot,
-                    stepRate == 0 ? D3D11_INPUT_PER_VERTEX_DATA : D3D11_INPUT_PER_INSTANCE_DATA,
-                    stepRate
-                };
+                    auto desc = elementDescs[i];
 
-                elements[element] = entry;
-                currentOffset += GetSizeInBytes(desc.Format);
-                element++;
+                    elements[element] = {
+                        GetSemanticString(desc.Semantic),
+                        (UINT)SemanticIndices::GetAndIncrement(si, desc.Semantic),
+                        D3D11Formats::ToDxgiFormat(desc.Format),
+                        desc.Offset != 0 ? desc.Offset : currentOffset,
+                        (UINT)slot,
+                        stepRate == 0 ? D3D11_INPUT_PER_VERTEX_DATA : D3D11_INPUT_PER_INSTANCE_DATA,
+                        stepRate
+                    };
+                    currentOffset += GetSizeInBytes(desc.Format);
+                    element++;
+                }
             }
         }
 
         ID3D11InputLayout* layout;
-        HRESULT result = _device->CreateInputLayout(elements, totalCount, vsBytecode, vsByteCodeLength, &layout);
-        free(elements);
+        HRESULT result = _device->CreateInputLayout(elements, (UINT) totalCount, vsBytecode, vsByteCodeLength, &layout);
+        // free(elements);
+        delete[] elements;
 
         CheckResult(result);
         return layout;
     }
 
-    std::string D3D11ResourceCache::GetSemanticString(VertexElementSemantic semantic) {
+    const char* D3D11ResourceCache::GetSemanticString(VertexElementSemantic semantic) {
         switch (semantic) {
         case VertexElementSemantic::Position:
             return "POSITION";

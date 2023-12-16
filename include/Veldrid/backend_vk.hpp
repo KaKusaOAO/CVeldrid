@@ -29,16 +29,16 @@
 #include <vector>
 #include <list>
 
-namespace vd {
+namespace __VD_NAMESPACE {
 
-    class VkDeviceMemoryManager : public Mochi::IDisposable {
+    class VkDeviceMemoryManager : public IDisposable {
     public:
-        using Ref = vd::Ref<VkDeviceMemoryManager>;
+        using Ref = __VD_NAMESPACE::Handle<VkDeviceMemoryManager>;
     };
 
     class VkGraphicsDevice : public GraphicsDevice {
     public:
-        using Ref = vd::Ref<VkGraphicsDevice>;
+        using Ref = __VD_NAMESPACE::Handle<VkGraphicsDevice>;
 
         VkGraphicsDevice(GraphicsDeviceOptions options,
                          std::optional<SwapchainDescription> scDesc);
@@ -50,7 +50,7 @@ namespace vd {
                                   std::optional<SwapchainDescription> scDesc,
                                   VulkanDeviceOptions vkOptions);
 
-        Mochi::Bool HasSurfaceExtension(std::string extension);
+        Bool HasSurfaceExtension(std::string extension);
         void EnableDebugCallback(vk::DebugReportFlagsEXT flags = vk::DebugReportFlagBitsEXT::eWarning | vk::DebugReportFlagBitsEXT::eError);
 
     private:
@@ -68,25 +68,25 @@ namespace vd {
         vk::PhysicalDeviceFeatures _physicalDeviceFeatures;
         vk::PhysicalDeviceMemoryProperties _physicalDeviceMemoryProperties;
         vk::Device _device;
-        Mochi::UInt32 _graphicsQueueIndex;
-        Mochi::UInt32 _presentQueueIndex;
+        UInt32 _graphicsQueueIndex;
+        UInt32 _presentQueueIndex;
 
         std::vector<std::string> _surfaceExtensions;
 
-        Mochi::Bool _standardValidationSupported;
-        Mochi::Bool _khronosValidationSupported;
+        Bool _standardValidationSupported;
+        Bool _khronosValidationSupported;
         vk::DebugReportCallbackEXT _debugCallbackHandle;
 
-        Mochi::Bool _supportsGetBufferMemoryRequirements2;
-        Mochi::Bool _supportsGetImageMemoryRequirements2;
-        Mochi::Bool _supportsGetPhysicalDeviceProperties2;
-        Mochi::Bool _supportsCreateMetalSurfaceEXT;
+        Bool _supportsGetBufferMemoryRequirements2;
+        Bool _supportsGetImageMemoryRequirements2;
+        Bool _supportsGetPhysicalDeviceProperties2;
+        Bool _supportsCreateMetalSurfaceEXT;
 
-        Mochi::Bool _useKHR_getPhysicalDeviceProperties2;
+        Bool _useKHR_getPhysicalDeviceProperties2;
 
-        void CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options);
+        void CreateInstance(Bool debug, VulkanDeviceOptions options);
         void CreatePhysicalDevice();
-        void CreateLogicalDevice(vk::SurfaceKHR surface, Mochi::Bool preferStandardClipY, VulkanDeviceOptions options);
+        void CreateLogicalDevice(vk::SurfaceKHR surface, Bool preferStandardClipY, VulkanDeviceOptions options);
         void GetQueueFamilyIndices(vk::SurfaceKHR surface);
 
         template <class T = void*>

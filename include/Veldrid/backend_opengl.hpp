@@ -45,7 +45,7 @@ typedef void* GLsync;
 
 typedef char GLchar;
 
-namespace vd {
+namespace __VD_NAMESPACE {
 
     class GL {
 
@@ -147,7 +147,7 @@ namespace vd {
     public:
         static void glClearDepth_Compat(GLfloat depth);
         static void CheckLastError();
-        static void LoadAllFunctions(void* context, FnGetProcAddress getProcAddress, Mochi::Bool gles);
+        static void LoadAllFunctions(void* context, FnGetProcAddress getProcAddress, Bool gles);
         
         template <typename Ret, typename... Args>
         static Ret Call(std::string name, Args... args) {
@@ -169,14 +169,14 @@ namespace vd {
 
     class IOpenGLDeferredResource {
     public:
-        virtual Mochi::Bool IsCreated() = 0;
+        virtual Bool IsCreated() = 0;
         virtual void EnsureResourceCreated() = 0;
         virtual void DestroyGLResources() = 0;
     };
 
     class OpenGLPlatformInfo {
     public:
-        using Ref = vd::Ref<OpenGLPlatformInfo>;
+        using Ref = __VD_NAMESPACE::Handle<OpenGLPlatformInfo>;
 
         using GetProcAddressFunc = std::function<void* (std::string)>;
         using MakeCurrentFunc = std::function<void(void*)>;
@@ -184,9 +184,9 @@ namespace vd {
         using ClearCurrentContextFunc = std::function<void()>;
         using DeleteContextFunc = std::function<void(void*)>;
         using SwapBuffersFunc = std::function<void()>;
-        using SetSyncToVBlankFunc = std::function<void(Mochi::Bool)>;
+        using SetSyncToVBlankFunc = std::function<void(Bool)>;
         using SetSwapchainFBFunc = std::function<void()>;
-        using ResizeSwapchainFunc = std::function<void(Mochi::UInt32, Mochi::UInt32)>;
+        using ResizeSwapchainFunc = std::function<void(UInt32, UInt32)>;
 
         void* GetOpenGLContextHandle();
         void* GetProcAddress(std::string funcName);
@@ -195,9 +195,9 @@ namespace vd {
         void ClearCurrentContext();
         void DeleteContext(void* context);
         void SwapBuffers();
-        void SetSyncToVerticalBlank(Mochi::Bool sync);
+        void SetSyncToVerticalBlank(Bool sync);
         void SetSwapchainFramebuffer();
-        void ResizeSwapchain(Mochi::UInt32 width, Mochi::UInt32 height);
+        void ResizeSwapchain(UInt32 width, UInt32 height);
 
     private:
         void* _contextHandle;
@@ -215,15 +215,15 @@ namespace vd {
     class OpenGLPipeline : public Pipeline, public IOpenGLDeferredResource {
     private:
         GLuint _program;
-        Mochi::Bool _disposeRequested;
-        Mochi::Bool _disposed;
-        Mochi::Bool _created;
+        Bool _disposeRequested;
+        Bool _disposed;
+        Bool _created;
 
         void CreateGLResources();
         void CreateGraphicsGLResources();
         void CreateComputeGLResources();
     public:
-        Mochi::Bool IsCreated() override;
+        Bool IsCreated() override;
         void EnsureResourceCreated() override;
         void DestroyGLResources() override;
     };
@@ -244,17 +244,17 @@ namespace vd {
     public:
         OpenGLGraphicsDevice(GraphicsDeviceOptions options,
                              OpenGLPlatformInfo::Ref info,
-                             Mochi::UInt32 width,
-                             Mochi::UInt32 height);
+                             UInt32 width,
+                             UInt32 height);
 
         void InitializeComponents();
         std::string GetDeviceName() override;
         std::string GetVendorName() override;
         GraphicsBackend GetBackendType() override;
         GraphicsApiVersion::Ref GetApiVersion() override;
-        Mochi::Bool IsUvOriginTopLeft() override;
-        Mochi::Bool IsDepthRangeZeroToOne() override;
-        Mochi::Bool IsClipSpaceYInverted() override;
+        Bool IsUvOriginTopLeft() override;
+        Bool IsDepthRangeZeroToOne() override;
+        Bool IsClipSpaceYInverted() override;
         ResourceFactory::Ref GetResourceFactory() override;
         GraphicsDeviceFeatures GetFeatures() override;
             

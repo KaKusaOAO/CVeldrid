@@ -22,14 +22,14 @@ namespace vd {
     };
 
     namespace VkUtils {
-        Mochi::Bool TryLoadVulkan();
-        Mochi::Lazy<Mochi::Bool> s_isVulkanLoaded(TryLoadVulkan);
+        Bool TryLoadVulkan();
+        Lazy<Bool> s_isVulkanLoaded(TryLoadVulkan);
 
         template <class T>
         using EnumerateResult = std::set<T>;
 
         EnumerateResult<std::string> EnumerateInstanceExtensions();
-        Mochi::Lazy<EnumerateResult<std::string>> s_instanceExtensions(EnumerateInstanceExtensions);
+        Lazy<EnumerateResult<std::string>> s_instanceExtensions(EnumerateInstanceExtensions);
     
         EnumerateResult<std::string> EnumerateInstanceLayers() {
             auto props = vk::enumerateInstanceLayerProperties();
@@ -42,11 +42,11 @@ namespace vd {
             return result;
         }
 
-        Mochi::Bool IsVulkanLoaded() {
+        Bool IsVulkanLoaded() {
             return s_isVulkanLoaded.GetValue();
         }
 
-        Mochi::Bool TryLoadVulkan() {
+        Bool TryLoadVulkan() {
             try {
                 vk::enumerateInstanceLayerProperties();
                 return true;
@@ -78,10 +78,10 @@ namespace vd {
         void TransitionImageLayout(
             vk::CommandBuffer cb,
             vk::Image image,
-            Mochi::UInt32 baseMipLevel,
-            Mochi::UInt32 levelCount,
-            Mochi::UInt32 baseArrayLayer,
-            Mochi::UInt32 layerCount,
+            UInt32 baseMipLevel,
+            UInt32 levelCount,
+            UInt32 baseArrayLayer,
+            UInt32 layerCount,
             vk::ImageAspectFlags aspectMask,
             vk::ImageLayout oldLayout,
             vk::ImageLayout newLayout) {
@@ -269,7 +269,7 @@ namespace vd {
 #if defined(_WIN32) 
             {
                 Win32SwapchainSource::Ref win32Source;
-                if (Mochi::TryCastRef(swapchainSource, win32Source)) {
+                if (TryCastRef(swapchainSource, win32Source)) {
                     if (doCheck && !gd->HasSurfaceExtension(VK_KHR_WIN32_SURFACE_EXTENSION_NAME)) {
                         ThrowExtensionNotAvailable(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
                     }
@@ -296,7 +296,7 @@ namespace vd {
     void VkGraphicsDevice::InitializeComponents(GraphicsDeviceOptions options,
                                                 std::optional<SwapchainDescription> scDesc,
                                                 VulkanDeviceOptions vkOptions) {
-        VkGraphicsDevice::Ref self = vd::AssertSubType<VkGraphicsDevice>(Mochi::GetRef<GraphicsDevice>(this));
+        VkGraphicsDevice::Ref self = vd::AssertSubType<VkGraphicsDevice>(GetRef<GraphicsDevice>(this));
         CreateInstance(options.Debug, vkOptions);
         
         vk::SurfaceKHR surface;
@@ -308,7 +308,7 @@ namespace vd {
         
     }
 
-    void VkGraphicsDevice::CreateInstance(Mochi::Bool debug, VulkanDeviceOptions options) {
+    void VkGraphicsDevice::CreateInstance(Bool debug, VulkanDeviceOptions options) {
         auto availableInstanceLayers = VkUtils::EnumerateInstanceLayers();
         auto availableInstanceExtensions = VkUtils::GetInstanceExtensions();
 
@@ -472,7 +472,7 @@ namespace vd {
         _physicalDeviceMemoryProperties = _physicalDevice.getMemoryProperties();
     }
 
-    void VkGraphicsDevice::CreateLogicalDevice(vk::SurfaceKHR surface, Mochi::Bool preferStandardClipY, VulkanDeviceOptions options) {
+    void VkGraphicsDevice::CreateLogicalDevice(vk::SurfaceKHR surface, Bool preferStandardClipY, VulkanDeviceOptions options) {
         GetQueueFamilyIndices(surface);
     }
 
@@ -502,7 +502,7 @@ namespace vd {
         }
     }
 
-    Mochi::Bool VkGraphicsDevice::HasSurfaceExtension(std::string extension) {
+    Bool VkGraphicsDevice::HasSurfaceExtension(std::string extension) {
         return std::find(_surfaceExtensions.begin(), _surfaceExtensions.end(), extension) != _surfaceExtensions.end();
     }
 
@@ -523,12 +523,12 @@ namespace vd {
             throw VeldridException("A Vulkan validation error was encountered: " + fullMessage.str());
         }
 
-        Mochi::Logger::Info(fullMessage.str(), "VkGraphicsDevice");
+        Logger::Info(fullMessage.str(), "VkGraphicsDevice");
         return VK_FALSE;
     }
 
     void VkGraphicsDevice::EnableDebugCallback(vk::DebugReportFlagsEXT flags) {
-        Mochi::Logger::Info("Enabling Vulkan Debug callbacks.");
+        Logger::Info("Enabling Vulkan Debug callbacks.");
         vk::DebugReportCallbackCreateInfoEXT debugCallbackCI = {};
         debugCallbackCI.flags = flags;
         debugCallbackCI.pfnCallback = DebugCallback;

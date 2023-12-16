@@ -8,6 +8,8 @@
 #ifndef __VD_CONFIG_HPP_HEADER_GUARD
 #define __VD_CONFIG_HPP_HEADER_GUARD
 
+#include <Veldrid/macros.hpp>
+
 #define VD_VALIDATE_USAGE
 
 #if !defined(_WIN32)

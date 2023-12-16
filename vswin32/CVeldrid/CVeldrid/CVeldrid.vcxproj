@@ -190,6 +190,8 @@
     <ClInclude Include="..\..\..\include\Veldrid\backend_opengl.hpp" />
     <ClInclude Include="..\..\..\include\Veldrid\backend_vk.hpp" />
     <ClInclude Include="..\..\..\include\Veldrid\config.hpp" />
+    <ClInclude Include="..\..\..\include\Veldrid\core.hpp" />
+    <ClInclude Include="..\..\..\include\Veldrid\macros.hpp" />
     <ClInclude Include="..\..\..\include\Veldrid\vd.hpp" />
     <ClInclude Include="..\..\..\include\Veldrid\backend_d3d11.hpp" />
   </ItemGroup>

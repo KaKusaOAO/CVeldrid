@@ -27,11 +27,11 @@
 
 #include <Metal/Metal.h>
 
-namespace vd {
+namespace __VD_NAMESPACE {
 
 class MTLFeatureSupport {
 public:
-    using Ref = vd::Ref<MTLFeatureSupport>;
+    using Ref = __VD_NAMESPACE::Handle<MTLFeatureSupport>;
     using Iterator = std::set<MTLGPUFamily>::iterator;
     using SizeType = std::set<MTLGPUFamily>::size_type;
     
@@ -53,7 +53,7 @@ private:
 
 class MTLCommandList : public CommandList {
 public:
-    using Ref = vd::Ref<MTLCommandList>;
+    using Ref = __VD_NAMESPACE::Handle<MTLCommandList>;
     
     id<MTLCommandBuffer> GetCommandBuffer();
     id<MTLCommandBuffer> Commit();
@@ -64,12 +64,12 @@ private:
 
 class MTLFence : public Fence {
 public:
-    using Ref = vd::Ref<MTLFence>;
+    using Ref = __VD_NAMESPACE::Handle<MTLFence>;
 };
 
 class MTLGraphicsDevice : public GraphicsDevice {
 public:
-    using Ref = vd::Ref<MTLGraphicsDevice>;
+    using Ref = __VD_NAMESPACE::Handle<MTLGraphicsDevice>;
     
     MTLGraphicsDevice(GraphicsDeviceOptions options,
                       std::optional<SwapchainDescription> swapchainDesc);
@@ -111,7 +111,7 @@ protected:
 
 class MTLResourceFactory : public ResourceFactory {
 public:
-    using Ref = vd::Ref<MTLResourceFactory>;
+    using Ref = __VD_NAMESPACE::Handle<MTLResourceFactory>;
     
     MTLResourceFactory(MTLGraphicsDevice::Ref device);
     GraphicsBackend GetBackendType() override;
@@ -125,7 +125,7 @@ private:
 
 class MTLPipeline : public Pipeline {
 public:
-    using Ref = vd::Ref<MTLPipeline>;
+    using Ref = __VD_NAMESPACE::Handle<MTLPipeline>;
     
     MTLPipeline(GraphicsPipelineDescription &description, MTLGraphicsDevice::Ref gd);
     

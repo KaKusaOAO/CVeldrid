@@ -131,7 +131,7 @@ namespace vd {
         }
     }
 
-    void GL::LoadAllFunctions(void* context, GL::FnGetProcAddress getProcAddress, Mochi::Bool gles) {
+    void GL::LoadAllFunctions(void* context, GL::FnGetProcAddress getProcAddress, Bool gles) {
         _getProcAddress = getProcAddress;
 
         // Common functions
@@ -205,7 +205,7 @@ namespace vd {
         __VD_LOAD_FUNCTION(glDisable);
 
 #undef __VD_LOAD_FUNCTION
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     // MARK: -
@@ -217,9 +217,9 @@ namespace vd {
     void  OpenGLPlatformInfo::ClearCurrentContext() { _ClearCurrentContext(); }
     void  OpenGLPlatformInfo::DeleteContext(void* context) { _DeleteContext(context); }
     void  OpenGLPlatformInfo::SwapBuffers() { _SwapBuffers(); }
-    void  OpenGLPlatformInfo::SetSyncToVerticalBlank(Mochi::Bool sync) { _SetSyncToVerticalBlank(sync); }
+    void  OpenGLPlatformInfo::SetSyncToVerticalBlank(Bool sync) { _SetSyncToVerticalBlank(sync); }
     void  OpenGLPlatformInfo::SetSwapchainFramebuffer() { _SetSwapchainFramebuffer(); }
-    void  OpenGLPlatformInfo::ResizeSwapchain(Mochi::UInt32 width, Mochi::UInt32 height) { _ResizeSwapchain(width, height); }
+    void  OpenGLPlatformInfo::ResizeSwapchain(UInt32 width, UInt32 height) { _ResizeSwapchain(width, height); }
 
     // MARK: -
 
@@ -240,72 +240,72 @@ namespace vd {
     }
 
     void OpenGLPipeline::CreateComputeGLResources() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
-    Mochi::Bool OpenGLPipeline::IsCreated() {
-        Mochi::ThrowNotImplemented();
+    Bool OpenGLPipeline::IsCreated() {
+        ThrowNotImplemented();
     }
 
     void OpenGLPipeline::EnsureResourceCreated() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     void OpenGLPipeline::DestroyGLResources() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     // MARK: -
 
     OpenGLGraphicsDevice::OpenGLGraphicsDevice(GraphicsDeviceOptions options,
         OpenGLPlatformInfo::Ref info,
-        Mochi::UInt32 width,
-        Mochi::UInt32 height) {
-        Mochi::ThrowNotImplemented();
+        UInt32 width,
+        UInt32 height) {
+        ThrowNotImplemented();
     }
 
     void OpenGLGraphicsDevice::InitializeComponents() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     std::string OpenGLGraphicsDevice::GetDeviceName() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     std::string OpenGLGraphicsDevice::GetVendorName() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     GraphicsApiVersion::Ref OpenGLGraphicsDevice::GetApiVersion() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     GraphicsBackend OpenGLGraphicsDevice::GetBackendType() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
-    Mochi::Bool OpenGLGraphicsDevice::IsUvOriginTopLeft() {
-        Mochi::ThrowNotImplemented();
+    Bool OpenGLGraphicsDevice::IsUvOriginTopLeft() {
+        ThrowNotImplemented();
     }
 
-    Mochi::Bool OpenGLGraphicsDevice::IsDepthRangeZeroToOne() {
-        Mochi::ThrowNotImplemented();
+    Bool OpenGLGraphicsDevice::IsDepthRangeZeroToOne() {
+        ThrowNotImplemented();
     }
 
-    Mochi::Bool OpenGLGraphicsDevice::IsClipSpaceYInverted() {
-        Mochi::ThrowNotImplemented();
+    Bool OpenGLGraphicsDevice::IsClipSpaceYInverted() {
+        ThrowNotImplemented();
     }
 
     ResourceFactory::Ref OpenGLGraphicsDevice::GetResourceFactory() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     GraphicsDeviceFeatures OpenGLGraphicsDevice::GetFeatures() {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 
     void OpenGLGraphicsDevice::SubmitCommandsCore(CommandList::Ref commandList, Fence::Ref fence) {
-        Mochi::ThrowNotImplemented();
+        ThrowNotImplemented();
     }
 }
 
