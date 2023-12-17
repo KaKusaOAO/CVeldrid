@@ -209,7 +209,10 @@ namespace __VD_NAMESPACE {
     class SwapchainSource {
     public:
         using Ref = __VD_NAMESPACE::Handle<SwapchainSource>;
-        
+
+        // Required for `dynamic_cast`. Don't remove.
+        virtual ~SwapchainSource();
+
     #if defined(__APPLE__)
     #if defined(__VD_TARGET_MACOS)
         static Ref CreateNSWindow(void *nsWindow);
@@ -217,6 +220,7 @@ namespace __VD_NAMESPACE {
         static Ref CreateUIKit(void *uiView);
     #endif // defined(TARGET_OS_MAC)
     #endif // defined(__APPLE__)
+
     };
 
     #if defined(__APPLE__)
@@ -708,8 +712,7 @@ namespace __VD_NAMESPACE {
 
     };
 
-
-    enum class TextureUsage : char {
+    enum class TextureUsageBits : char {
         Sampled         = 1 << 0,
         Storage         = 1 << 1,
         RenderTarget    = 1 << 2,
@@ -719,17 +722,7 @@ namespace __VD_NAMESPACE {
         GenerateMipmaps = 1 << 6
     };
 
-    inline TextureUsage operator|(TextureUsage a, TextureUsage b) {
-        return static_cast<TextureUsage>(static_cast<char>(a) | static_cast<char>(b));
-    }
-
-    inline void operator|=(TextureUsage& a, TextureUsage b) {
-        a = a | b;
-    }
-
-    inline Bool operator&(TextureUsage a, TextureUsage b) {
-        return (static_cast<char>(a) & static_cast<char>(b)) != 0;
-    }
+    using TextureUsage = Flags<TextureUsageBits>;
 
     enum class TextureType {
         Texture1D,

@@ -6,6 +6,7 @@
 #define __VD_CORE_HPP_HEADER_GUARD
 
 #include <Mochi/core.hpp>
+#include <Mochi/meta.hpp>
 #include <Veldrid/macros.hpp>
 
 namespace __VD_NAMESPACE {
@@ -28,10 +29,10 @@ namespace __VD_NAMESPACE {
     using Handle = __MC_NAMESPACE::Handle<T>;
 
     template <class T, class TBase>
-    concept IsDerived = __MC_NAMESPACE::IsDerived<T, TBase>;
+    concept IsDerived = __MC_NAMESPACE::Concepts::IsDerived<T, TBase>;
 
     template <int A, int B>
-    concept IsGreaterThan = __MC_NAMESPACE::IsGreaterThan<A, B>;
+    concept IsGreaterThan = __MC_NAMESPACE::Concepts::IsTrue<(A > B)>;
 }
 
 #endif

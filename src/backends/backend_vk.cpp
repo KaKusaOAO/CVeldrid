@@ -23,13 +23,13 @@ namespace vd {
 
     namespace VkUtils {
         Bool TryLoadVulkan();
-        Lazy<Bool> s_isVulkanLoaded(TryLoadVulkan);
+        Mochi::Lazy<Bool> s_isVulkanLoaded(TryLoadVulkan);
 
         template <class T>
         using EnumerateResult = std::set<T>;
 
         EnumerateResult<std::string> EnumerateInstanceExtensions();
-        Lazy<EnumerateResult<std::string>> s_instanceExtensions(EnumerateInstanceExtensions);
+        Mochi::Lazy<EnumerateResult<std::string>> s_instanceExtensions(EnumerateInstanceExtensions);
     
         EnumerateResult<std::string> EnumerateInstanceLayers() {
             auto props = vk::enumerateInstanceLayerProperties();
@@ -48,7 +48,7 @@ namespace vd {
 
         Bool TryLoadVulkan() {
             try {
-                vk::enumerateInstanceLayerProperties();
+                VD_UNUSED(vk::enumerateInstanceLayerProperties());
                 return true;
             }
             catch (std::exception&) {
@@ -296,7 +296,7 @@ namespace vd {
     void VkGraphicsDevice::InitializeComponents(GraphicsDeviceOptions options,
                                                 std::optional<SwapchainDescription> scDesc,
                                                 VulkanDeviceOptions vkOptions) {
-        VkGraphicsDevice::Ref self = vd::AssertSubType<VkGraphicsDevice>(GetRef<GraphicsDevice>(this));
+        VkGraphicsDevice::Ref self = vd::AssertSubType<VkGraphicsDevice>(vd::GetRef<GraphicsDevice>(this));
         CreateInstance(options.Debug, vkOptions);
         
         vk::SurfaceKHR surface;
@@ -419,10 +419,10 @@ namespace vd {
             }
         }
 
-        instanceCI.enabledExtensionCount = instanceExtensions.size();
+        instanceCI.enabledExtensionCount   = (uint32_t) instanceExtensions.size();
         instanceCI.ppEnabledExtensionNames = instanceExtensions.data();
 
-        instanceCI.enabledLayerCount = instanceLayers.size();
+        instanceCI.enabledLayerCount = (uint32_t) instanceLayers.size();
         if (instanceLayers.size() > 0) {
             instanceCI.ppEnabledLayerNames = instanceLayers.data();
         }
@@ -523,12 +523,12 @@ namespace vd {
             throw VeldridException("A Vulkan validation error was encountered: " + fullMessage.str());
         }
 
-        Logger::Info(fullMessage.str(), "VkGraphicsDevice");
+        Mochi::Logger::Info(fullMessage.str(), "VkGraphicsDevice");
         return VK_FALSE;
     }
 
     void VkGraphicsDevice::EnableDebugCallback(vk::DebugReportFlagsEXT flags) {
-        Logger::Info("Enabling Vulkan Debug callbacks.");
+        Mochi::Logger::Info("Enabling Vulkan Debug callbacks.");
         vk::DebugReportCallbackCreateInfoEXT debugCallbackCI = {};
         debugCallbackCI.flags = flags;
         debugCallbackCI.pfnCallback = DebugCallback;

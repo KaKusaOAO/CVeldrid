@@ -117,6 +117,8 @@ namespace __VD_NAMESPACE {
 
     #if defined(_WIN32)
 
+    SwapchainSource::~SwapchainSource() {}
+
     Win32SwapchainSource::Win32SwapchainSource(void* hwnd, void* hInstance) : _hwnd(hwnd), _hInstance(hInstance) {}
     void* Win32SwapchainSource::GetHwnd() { return _hwnd; }
     void* Win32SwapchainSource::GetHInstance() { return _hInstance; }
@@ -391,8 +393,8 @@ namespace __VD_NAMESPACE {
             throw VeldridException("TextureView mip level and array layer range must be contained in the target Texture.");
         }
         
-        if (!(description.Target->GetUsage() & TextureUsage::Sampled) &&
-            !(description.Target->GetUsage() & TextureUsage::Storage)) {
+        if (!description.Target->GetUsage().HasFlag(TextureUsageBits::Sampled) &&
+            !description.Target->GetUsage().HasFlag(TextureUsageBits::Storage)) {
             throw VeldridException("To create a TextureView, the target texture must have either Sampled or Storage usage flags.");
         }
         

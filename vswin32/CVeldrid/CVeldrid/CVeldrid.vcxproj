@@ -93,7 +93,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalOptions>/Zc:auto</AdditionalOptions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;$(ProjectDir)..\..\..\3rdparty\CMochi\3rdparty\jsoncpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,7 +117,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalOptions>/Zc:auto</AdditionalOptions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;$(ProjectDir)..\..\..\3rdparty\CMochi\3rdparty\jsoncpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,7 +141,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalOptions>/Zc:auto</AdditionalOptions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;$(ProjectDir)..\..\..\3rdparty\CMochi\3rdparty\jsoncpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -165,7 +165,7 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <AdditionalOptions>/Zc:auto</AdditionalOptions>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.268.0\Include;$(ProjectDir)..\..\..\include;$(ProjectDir)..\..\..\3rdparty\CMochi\include;$(ProjectDir)..\..\..\3rdparty\CMochi\3rdparty\jsoncpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

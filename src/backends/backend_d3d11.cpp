@@ -281,30 +281,30 @@ namespace vd {
     }
 
     TextureUsage D3D11Formats::GetVdUsage(D3D11_BIND_FLAG bindFlags, D3D11_CPU_ACCESS_FLAG cpuFlags, D3D11_RESOURCE_MISC_FLAG optionFlags) {
-        TextureUsage usage = (TextureUsage)0;
+        TextureUsage usage;
 
         if (bindFlags & D3D11_BIND_RENDER_TARGET) {
-            usage |= TextureUsage::RenderTarget;
+            usage |= TextureUsageBits::RenderTarget;
         }
 
         if (bindFlags & D3D11_BIND_DEPTH_STENCIL) {
-            usage |= TextureUsage::DepthStencil;
+            usage |= TextureUsageBits::DepthStencil;
         }
 
         if (bindFlags & D3D11_BIND_SHADER_RESOURCE) {
-            usage |= TextureUsage::Sampled;
+            usage |= TextureUsageBits::Sampled;
         }
 
         if (bindFlags & D3D11_BIND_UNORDERED_ACCESS) {
-            usage |= TextureUsage::Storage;
+            usage |= TextureUsageBits::Storage;
         }
 
         if (optionFlags & D3D11_RESOURCE_MISC_TEXTURECUBE) {
-            usage |= TextureUsage::Cubemap;
+            usage |= TextureUsageBits::Cubemap;
         }
 
         if (optionFlags & D3D11_RESOURCE_MISC_GENERATE_MIPS) {
-            usage |= TextureUsage::GenerateMipmaps;
+            usage |= TextureUsageBits::GenerateMipmaps;
         }
 
         return usage;
@@ -349,7 +349,7 @@ namespace vd {
         _type = description.Type;
         _sampleCount = description.SampleCount;
 
-        _dxgiFormat = D3D11Formats::ToDxgiFormat(description.Format, description.Usage & TextureUsage::DepthStencil);
+        _dxgiFormat = D3D11Formats::ToDxgiFormat(description.Format, description.Usage.HasFlag(TextureUsageBits::DepthStencil));
         _typelessDxgiFormat = D3D11Formats::GetTypelessFormat(_dxgiFormat);
 
         D3D11_CPU_ACCESS_FLAG    cpuFlags      = (D3D11_CPU_ACCESS_FLAG) 0;
@@ -357,34 +357,34 @@ namespace vd {
         D3D11_BIND_FLAG          bindFlags     = (D3D11_BIND_FLAG) 0;
         D3D11_RESOURCE_MISC_FLAG optionFlags   = (D3D11_RESOURCE_MISC_FLAG) 0;
 
-        if (description.Usage & TextureUsage::RenderTarget) {
+        if (description.Usage.HasFlag(TextureUsageBits::RenderTarget)) {
             bindFlags = (D3D11_BIND_FLAG) (bindFlags | D3D11_BIND_RENDER_TARGET);
         }
 
-        if (description.Usage & TextureUsage::DepthStencil) {
-            bindFlags = (D3D11_BIND_FLAG) (bindFlags | D3D11_BIND_DEPTH_STENCIL);
+        if (description.Usage.HasFlag(TextureUsageBits::DepthStencil)) {
+            bindFlags = (D3D11_BIND_FLAG)(bindFlags | D3D11_BIND_DEPTH_STENCIL);
         }
 
-        if (description.Usage & TextureUsage::Sampled) {
-            bindFlags = (D3D11_BIND_FLAG) (bindFlags | D3D11_BIND_SHADER_RESOURCE);
+        if (description.Usage.HasFlag(TextureUsageBits::Sampled)) {
+            bindFlags = (D3D11_BIND_FLAG)(bindFlags | D3D11_BIND_SHADER_RESOURCE);
         }
 
-        if (description.Usage & TextureUsage::Storage) {
-            bindFlags = (D3D11_BIND_FLAG) (bindFlags | D3D11_BIND_UNORDERED_ACCESS);
+        if (description.Usage.HasFlag(TextureUsageBits::Storage)) {
+            bindFlags = (D3D11_BIND_FLAG)(bindFlags | D3D11_BIND_UNORDERED_ACCESS);
         }
 
-        if (description.Usage & TextureUsage::Staging) {
-            cpuFlags = (D3D11_CPU_ACCESS_FLAG) (cpuFlags | D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE);
-            resourceUsage = D3D11_USAGE_STAGING;
+        if (description.Usage.HasFlag(TextureUsageBits::Staging)) {
+            cpuFlags = (D3D11_CPU_ACCESS_FLAG)(cpuFlags | D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE);
+                resourceUsage = D3D11_USAGE_STAGING;
         }
 
-        if (description.Usage & TextureUsage::GenerateMipmaps) {
+        if (description.Usage.HasFlag(TextureUsageBits::GenerateMipmaps)) {
             bindFlags = (D3D11_BIND_FLAG) (bindFlags | D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
             optionFlags = (D3D11_RESOURCE_MISC_FLAG) (optionFlags | D3D11_RESOURCE_MISC_GENERATE_MIPS);
         }
 
         int arraySize = (int) description.ArrayLayers;
-        if (description.Usage & TextureUsage::Cubemap) {
+        if (description.Usage.HasFlag(TextureUsageBits::Cubemap)) {
             optionFlags = (D3D11_RESOURCE_MISC_FLAG) (optionFlags | D3D11_RESOURCE_MISC_TEXTURECUBE);
             arraySize *= 6;
         }
@@ -476,7 +476,7 @@ namespace vd {
                                           (D3D11_CPU_ACCESS_FLAG) desc.CPUAccessFlags, 
                                           (D3D11_RESOURCE_MISC_FLAG) desc.MiscFlags);
 
-        _dxgiFormat = D3D11Formats::ToDxgiFormat(format, _usage & TextureUsage::DepthStencil);
+        _dxgiFormat = D3D11Formats::ToDxgiFormat(format, _usage.HasFlag(TextureUsageBits::DepthStencil));
         _typelessDxgiFormat = D3D11Formats::GetTypelessFormat(_dxgiFormat);
     }
 
