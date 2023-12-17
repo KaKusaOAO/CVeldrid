@@ -93,6 +93,8 @@ namespace __VD_NAMESPACE {
 
     // MARK: -
 
+    SwapchainSource::~SwapchainSource() {}
+    
     #if defined(__APPLE__)
     #   if defined(__VD_TARGET_MACOS)
     SwapchainSource::Ref SwapchainSource::CreateNSWindow(void *nsWindow) {
@@ -114,11 +116,8 @@ namespace __VD_NAMESPACE {
     UIView* UIViewSwapchainSource::GetUIView() { return _view; }
     #   endif // defined(__VD_TARGET_MACOS)
     #endif // defined(__APPLE__)
-
+    
     #if defined(_WIN32)
-
-    SwapchainSource::~SwapchainSource() {}
-
     Win32SwapchainSource::Win32SwapchainSource(void* hwnd, void* hInstance) : _hwnd(hwnd), _hInstance(hInstance) {}
     void* Win32SwapchainSource::GetHwnd() { return _hwnd; }
     void* Win32SwapchainSource::GetHInstance() { return _hInstance; }
