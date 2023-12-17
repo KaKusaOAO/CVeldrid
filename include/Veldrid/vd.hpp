@@ -74,7 +74,7 @@ namespace __VD_NAMESPACE {
 
     template <typename TBase, typename T> requires IsDerived<T, std::enable_shared_from_this<TBase>>
     Handle<T> GetRef(T* obj) {
-        return __MC_NAMESPACE::GetRef<T>(obj);
+        return __MC_NAMESPACE::GetRef<TBase>(obj);
     }
 
     template <class T, class TBase> requires IsDerived<T, TBase>

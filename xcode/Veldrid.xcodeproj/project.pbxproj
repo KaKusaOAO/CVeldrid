@@ -9,7 +9,8 @@
 /* Begin PBXBuildFile section */
 		22B20D2A2B2B39BB003ADF64 /* backend_vk.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22B20D272B2B39BB003ADF64 /* backend_vk.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		22B20D2C2B2B39D0003ADF64 /* backend_vk.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 22B20D2B2B2B39D0003ADF64 /* backend_vk.cpp */; };
-		22B20D332B2B3C82003ADF64 /* libvulkan.1.3.268.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22B20D302B2B3C17003ADF64 /* libvulkan.1.3.268.dylib */; };
+		22B20D552B2D5594003ADF64 /* macros.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22B20D532B2D5594003ADF64 /* macros.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		22B20D562B2D5594003ADF64 /* core.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 22B20D542B2D5594003ADF64 /* core.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		22C6F98D2B22EF4C00F5373C /* Veldrid.docc in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F98C2B22EF4C00F5373C /* Veldrid.docc */; };
 		22C6F9932B22EF4D00F5373C /* Veldrid.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C6F9882B22EF4C00F5373C /* Veldrid.framework */; };
 		22C6F9982B22EF4D00F5373C /* VeldridTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22C6F9972B22EF4D00F5373C /* VeldridTests.swift */; };
@@ -73,6 +74,8 @@
 		22B20D2B2B2B39D0003ADF64 /* backend_vk.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = backend_vk.cpp; path = ../src/backends/backend_vk.cpp; sourceTree = "<group>"; };
 		22B20D2D2B2B3AF6003ADF64 /* vulkan.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = vulkan.framework; path = ../../../../../VulkanSDK/1.3.268.1/macOS/Frameworks/vulkan.framework; sourceTree = "<group>"; };
 		22B20D302B2B3C17003ADF64 /* libvulkan.1.3.268.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libvulkan.1.3.268.dylib; path = ../../../../../VulkanSDK/1.3.268.1/macOS/lib/libvulkan.1.3.268.dylib; sourceTree = "<group>"; };
+		22B20D532B2D5594003ADF64 /* macros.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = macros.hpp; path = ../include/Veldrid/macros.hpp; sourceTree = "<group>"; };
+		22B20D542B2D5594003ADF64 /* core.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = core.hpp; path = ../include/Veldrid/core.hpp; sourceTree = "<group>"; };
 		22C6F9882B22EF4C00F5373C /* Veldrid.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Veldrid.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		22C6F98B2B22EF4C00F5373C /* Veldrid.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Veldrid.hpp; sourceTree = "<group>"; };
 		22C6F98C2B22EF4C00F5373C /* Veldrid.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Veldrid.docc; sourceTree = "<group>"; };
@@ -99,7 +102,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22B20D332B2B3C82003ADF64 /* libvulkan.1.3.268.dylib in Frameworks */,
 				22C6F9CB2B22F08E00F5373C /* OpenGLES.framework in Frameworks */,
 				22C6F9C72B22F08800F5373C /* Metal.framework in Frameworks */,
 				22C6F9C82B22F08800F5373C /* MetalFX.framework in Frameworks */,
@@ -162,6 +164,8 @@
 		22C6F9A22B22EF7300F5373C /* Headers */ = {
 			isa = PBXGroup;
 			children = (
+				22B20D542B2D5594003ADF64 /* core.hpp */,
+				22B20D532B2D5594003ADF64 /* macros.hpp */,
 				22B20D272B2B39BB003ADF64 /* backend_vk.hpp */,
 				22C6F9A62B22EFFF00F5373C /* backend_metal.hpp */,
 				22C6F9A72B22EFFF00F5373C /* backend_opengl.hpp */,
@@ -213,12 +217,14 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22B20D552B2D5594003ADF64 /* macros.hpp in Headers */,
+				22B20D562B2D5594003ADF64 /* core.hpp in Headers */,
 				22C6F9A92B22EFFF00F5373C /* config.hpp in Headers */,
 				22C6F9AA2B22EFFF00F5373C /* backend_metal.hpp in Headers */,
+				22C6F9AB2B22EFFF00F5373C /* backend_opengl.hpp in Headers */,
 				22B20D2A2B2B39BB003ADF64 /* backend_vk.hpp in Headers */,
 				22C6F9A82B22EFFF00F5373C /* vd.hpp in Headers */,
 				22C6F9992B22EF4D00F5373C /* Veldrid.hpp in Headers */,
-				22C6F9AB2B22EFFF00F5373C /* backend_opengl.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
